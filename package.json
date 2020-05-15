@@ -1,7 +1,7 @@
 {
   "name": "moleculer-db-typeorm",
   "version": "0.0.1",
-  "description": "Moleculer service to store entities in database for standard or multi-tenant solutions",
+  "description": "Moleculer service to store typeorm entities in database for standard or multi-tenant solutions",
   "main": "index.js",
   "types": "./moleculer-db-typeorm.d.ts",
   "scripts": {
@@ -19,9 +19,9 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/moleculerjs/moleculer-db.git"
+    "url": "https://github.com/Karnith/moleculer-db.git"
   },
-  "homepage": "https://github.com/moleculerjs/moleculer-db/tree/master/packages/moleculer-db#readme",
+  "homepage": "https://github.com/Karnith/moleculer-db/tree/master/packages/moleculer-db#readme",
   "author": "Matthew Marino",
   "license": "MIT",
   "peerDependencies": {
