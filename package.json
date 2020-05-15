@@ -1,0 +1,58 @@
+{
+  "name": "moleculer-db-typeorm",
+  "version": "0.0.1",
+  "description": "Moleculer service to store entities in database for standard or multi-tenant solutions",
+  "main": "index.js",
+  "types": "./moleculer-db-typeorm.d.ts",
+  "scripts": {
+    "dev": "nodemon examples/index.js",
+    "ci": "jest --watch",
+    "test": "jest --coverage",
+    "lint": "eslint --ext=.js src test",
+    "deps": "npm-check -u",
+    "readme": "node node_modules/moleculer-docgen/index.js -t README.md src/index.js",
+    "coverall": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
+  },
+  "keywords": [
+    "microservice",
+    "moleculer"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/moleculerjs/moleculer-db.git"
+  },
+  "homepage": "https://github.com/moleculerjs/moleculer-db/tree/master/packages/moleculer-db#readme",
+  "author": "Matthew Marino",
+  "license": "MIT",
+  "peerDependencies": {
+    "moleculer": "^0.14.6"
+  },
+  "devDependencies": {
+    "benchmarkify": "^2.1.2",
+    "coveralls": "^3.1.0",
+    "fakerator": "^0.3.1",
+    "jest": "^25.4.0",
+    "jest-cli": "^25.4.0",
+    "kleur": "^3.0.3",
+    "lolex": "^6.0.0",
+    "moleculer": "^0.13.11",
+    "moleculer-docgen": "^0.2.2",
+    "nodemon": "^2.0.3",
+    "npm-check": "^5.9.2"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "/test/services/"
+    ]
+  },
+  "engines": {
+    "node": ">= 8.x.x"
+  },
+  "dependencies": {
+    "bluebird": "^3.7.2",
+    "lodash": "^4.17.15",
+    "nedb": "^1.8.0"
+  }
+}
