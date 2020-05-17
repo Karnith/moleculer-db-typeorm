@@ -2,18 +2,21 @@
 
 # moleculer-db-typeorm [![NPM version](https://img.shields.io/npm/v/moleculer-db.svg)](https://www.npmjs.com/package/moleculer-db)
 
-Moleculer service to store entities in database for typeorm.
+Moleculer service to store entities in database for typeorm based on moleculer-db.
+
+Current work in progress, stable for MongoDB. Only MongoDB adapter created so far for typeorm framework.
 
 # Features
-- default CRUD actions
+- default CRUD actions for typeorm
 - cached actions
 - pagination support
 - pluggable adapter ([NeDB](https://github.com/louischatriot/nedb) is the default memory adapter for testing & prototyping)
-- official adapters for MongoDB, PostgreSQL, SQLite, MySQL, MSSQL.
+- adapter for MongoDB (PostgreSQL, SQLite, MySQL, MSSQL in development).
 - fields filtering
 - populating
 - encode/decode IDs
 - entity lifecycle events for notifications
+- single connection or multiple connections for services to connect to typeorm databases
 
 # Install
 
