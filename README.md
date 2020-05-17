@@ -39,6 +39,9 @@ broker.createService({
     name: "users",
     mixins: [DbService],
 
+    // mode needed to switch between "standard" or "mt" (milti-tenant) modes
+    mode: "standard",
+
     settings: {
         fields: ["_id", "username", "name"]
     },
@@ -288,6 +291,36 @@ _<sup>Since: {{this}}</sup>_
 # Methods
 
 <!-- AUTO-CONTENT-START:METHODS -->
+## `connect` 
+
+Connect to database.
+
+### Parameters
+| Property | Type | Default | Description |
+| -------- | ---- | ------- | ----------- |
+| `mode` | `*` | **required** |  |
+| `options` | `*` | **required** |  |
+| `cb` | `*` | **required** |  |
+
+### Results
+**Type:** `Connection`
+
+returns connection as callback
+
+### Examples
+```js
+// use .connect() for standard single connection (mode: 'mt')
+// use .connect(mode, options, cb) to create multiple connecitons in multi-tenant mode (mode: 'mt')
+
+let productsConnection: Connection;
+await this.connect('mt', productOpts, (conn: Connection) => {
+    return (productsConnection = conn);
+});
+
+console.log(await productsConnection!.getMongoRepository(Products).find());
+
+```
+
 ## `sanitizeParams` 
 
 Sanitize context parameters at `find` action.

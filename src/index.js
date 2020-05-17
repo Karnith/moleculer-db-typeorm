@@ -332,10 +332,26 @@ module.exports = {
 		/**
 		 * Connect to database.
 		 * 
+		 * @example
+		 * ```js
+		 * // use .connect() for standard single connection (mode: 'mt')
+		 * // use .connect(mode, options, cb) to create multiple connecitons in multi-tenant mode (mode: 'mt')
+		 * 
+		 * let productsConnection: Connection;
+		 * await this.connect('mt', productOpts, (conn: Connection) => {
+		 *	return (productsConnection = conn);
+		 * });
+		 * 
+		 * console.log(await productsConnection!.getMongoRepository(Products).find());
+		 * 
+		 * ```
+		 * @methods
+		 * 
 		 * @param {*} mode 
 		 * @param {*} options 
 		 * @param {*} cb 
 		 * 
+		 * @returns {Connection} returns connection as callback
 		 */
 		connect(
 			mode = this.schema.mode,
