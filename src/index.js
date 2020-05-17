@@ -1,6 +1,6 @@
 /*
- * moleculer-db
- * Copyright (c) 2019 MoleculerJS (https://github.com/moleculerjs/moleculer-db)
+ * moleculer-db-typeorm
+ * Copyright (c) 2020 Matthew Marino (https://github.com/Karnith/moleculer-db-typeorm)
  * MIT Licensed
  */
 
@@ -16,7 +16,7 @@ const pkg = require("../package.json");
 /**
  * Service mixin to access database entities
  *
- * @name moleculer-db
+ * @name moleculer-db-typeorm
  * @module Service
  */
 module.exports = {
@@ -331,6 +331,11 @@ module.exports = {
 
 		/**
 		 * Connect to database.
+		 * 
+		 * @param {*} mode 
+		 * @param {*} options 
+		 * @param {*} cb 
+		 * 
 		 */
 		connect(
 			mode = this.schema.mode,

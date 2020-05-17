@@ -1,8 +1,8 @@
 ![Moleculer logo](https://moleculer.services/images/banner.png)
 
-# moleculer-db-typeorm [![NPM version](https://img.shields.io/npm/v/moleculer-db.svg)](https://www.npmjs.com/package/moleculer-db)
+# moleculer-db [![NPM version](https://img.shields.io/npm/v/moleculer-db.svg)](https://www.npmjs.com/package/moleculer-db)
 
-Moleculer service to store entities in database for typeorm.
+Moleculer service to store entities in database.
 
 # Features
 - default CRUD actions
@@ -18,7 +18,7 @@ Moleculer service to store entities in database for typeorm.
 # Install
 
 ```bash
-$ npm install moleculer-db-typeorm --save
+$ npm install moleculer-db --save
 ```
 
 # Usage
@@ -27,7 +27,7 @@ $ npm install moleculer-db-typeorm --save
 "use strict";
 
 const { ServiceBroker } = require("moleculer");
-const DbService = require("moleculer-db-typeorm");
+const DbService = require("moleculer-db");
 
 const broker = new ServiceBroker();
 
