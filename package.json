@@ -19,9 +19,9 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/Karnith/moleculer-db.git"
+    "url": "https://github.com/Karnith/moleculer-db-typeorm.git"
   },
-  "homepage": "https://github.com/Karnith/moleculer-db/tree/master/packages/moleculer-db#readme",
+  "homepage": "https://github.com/Karnith/moleculer-db-typeorm/tree/master/packages/moleculer-db#readme",
   "author": "Matthew Marino",
   "license": "MIT",
   "peerDependencies": {

@@ -1,24 +1,29 @@
 ![Moleculer logo](https://moleculer.services/images/banner.png)
 
-# moleculer-db [![NPM version](https://img.shields.io/npm/v/moleculer-db.svg)](https://www.npmjs.com/package/moleculer-db)
+# moleculer-db-typeorm [![NPM version](https://img.shields.io/npm/v/moleculer-db-typeorm.svg)](https://www.npmjs.com/package/moleculer-db-typeorm)
 
-Moleculer service to store entities in database.
+Moleculer service to store entities in database for typeorm based on moleculer-db. Not to be used in cnjunction with moleculer-db, but a drop-in replacement when using typeorm framework that includes multi-tenancy connection methods.
+
+The reasoning behind this new module is that in multi-tenancy micro service applications it can be a lot of work to create a micro service for each entity when using typeorm. The single db connection per service would mean a lot of unnecessary chatter between services with ctx or broker service calls. Furthermore if there is a need to isolate tenant data by means of a database for each tenant, then the onboarding process of each additional tenant would mean creating a new service for each tenant. This module solves that by giving the developer the ability to create additonal connections to other databases within a single service, reducing the need for a service for each database. The service can then also connect to other database engines, given there is an adapter for it through typeorm, and disaster recovery of a tenant is simplified without effecting other tenant's data.
+
+Current work in progress, stable for MongoDB. Only MongoDB adapter created so far for typeorm framework.
 
 # Features
-- default CRUD actions
+- default CRUD actions for typeorm
 - cached actions
 - pagination support
 - pluggable adapter ([NeDB](https://github.com/louischatriot/nedb) is the default memory adapter for testing & prototyping)
-- official adapters for MongoDB, PostgreSQL, SQLite, MySQL, MSSQL.
+- adapter for MongoDB (PostgreSQL, SQLite, MySQL, MSSQL in development).
 - fields filtering
 - populating
 - encode/decode IDs
 - entity lifecycle events for notifications
+- single connection or multiple connections for services to connect to typeorm databases
 
 # Install
 
 ```bash
-$ npm install moleculer-db --save
+$ npm install moleculer-db-typeorm --save
 ```
 
 # Usage
@@ -27,7 +32,7 @@ $ npm install moleculer-db --save
 "use strict";
 
 const { ServiceBroker } = require("moleculer");
-const DbService = require("moleculer-db");
+const DbService = require("moleculer-db-typeorm");
 
 const broker = new ServiceBroker();
 
@@ -35,6 +40,9 @@ const broker = new ServiceBroker();
 broker.createService({
     name: "users",
     mixins: [DbService],
+
+    // mode needed to switch between "standard" or "mt" (milti-tenant) modes
+    mode: "standard",
 
     settings: {
         fields: ["_id", "username", "name"]
@@ -285,6 +293,36 @@ _<sup>Since: {{this}}</sup>_
 # Methods
 
 <!-- AUTO-CONTENT-START:METHODS -->
+## `connect` 
+
+Connect to database.
+
+### Parameters
+| Property | Type | Default | Description |
+| -------- | ---- | ------- | ----------- |
+| `mode` | `*` | **required** |  |
+| `options` | `*` | **required** |  |
+| `cb` | `*` | **required** |  |
+
+### Results
+**Type:** `Connection`
+
+returns connection as callback
+
+### Examples
+```js
+// use .connect() for standard single connection (mode: 'mt')
+// use .connect(mode, options, cb) to create multiple connecitons in multi-tenant mode (mode: 'mt')
+
+let productsConnection: Connection;
+await this.connect('mt', productOpts, (conn: Connection) => {
+    return (productsConnection = conn);
+});
+
+console.log(await productsConnection!.getMongoRepository(Products).find());
+
+```
+
 ## `sanitizeParams` 
 
 Sanitize context parameters at `find` action.
