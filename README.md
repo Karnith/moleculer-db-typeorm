@@ -1,8 +1,10 @@
 ![Moleculer logo](https://moleculer.services/images/banner.png)
 
-# moleculer-db-typeorm [![NPM version](https://img.shields.io/npm/v/moleculer-db.svg)](https://www.npmjs.com/package/moleculer-db)
+# moleculer-db-typeorm [![NPM version](https://img.shields.io/npm/v/moleculer-db-typeorm.svg)](https://www.npmjs.com/package/moleculer-db-typeorm)
 
-Moleculer service to store entities in database for typeorm based on moleculer-db.
+Moleculer service to store entities in database for typeorm based on moleculer-db. Not to be used in cnjunction with moleculer-db, but a drop-in replacement when using typeorm framework that includes multi-tenancy connection methods.
+
+The reasoning behind this new module is that in multi-tenancy micro service applications it can be a lot of work to create a micro service for each entity when using typeorm. The single db connection per service would mean a lot of unnecessary chatter between services with ctx or broker service calls. Furthermore if there is a need to isolate tenant data by means of a database for each tenant, then the onboarding process of each additional tenant would mean creating a new service for each tenant. This module solves that by giving the developer the ability to create additonal connections to other databases within a single service, reducing the need for a service for each database. The service can then also connect to other database engines, given there is an adapter for it through typeorm, and disaster recovery of a tenant is simplified without effecting other tenant's data.
 
 Current work in progress, stable for MongoDB. Only MongoDB adapter created so far for typeorm framework.
 
