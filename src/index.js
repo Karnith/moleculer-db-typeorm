@@ -959,7 +959,7 @@ module.exports = {
 		switch (this.schema.mode.toLowerCase()) {
 			case "mt":
 				this.adapter.init(this.broker, this);
-				this.logger.warn("Database connection set to multi-tenant. Use this.adapter.connect() to connect to TypeORM connecion.");
+				this.logger.warn("Database connection set to multi-tenant. Use this.connect() to connect to TypeORM connecion and this.disconnect() to close it.");
 				break;
 			case "standard":
 				this.adapter.init(this.broker, this);
