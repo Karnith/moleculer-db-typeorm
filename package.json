@@ -1,6 +1,6 @@
 {
   "name": "moleculer-db-typeorm",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Moleculer service to store typeorm entities in database for standard or multi-tenant solutions",
   "main": "index.js",
   "types": "./moleculer-db-typeorm.d.ts",
@@ -25,19 +25,19 @@
   "author": "Matthew Marino",
   "license": "MIT",
   "peerDependencies": {
-    "moleculer": "^0.14.6"
+    "moleculer": "^0.14.10"
   },
   "devDependencies": {
     "benchmarkify": "^2.1.2",
     "coveralls": "^3.1.0",
     "fakerator": "^0.3.1",
-    "jest": "^25.4.0",
-    "jest-cli": "^25.4.0",
-    "kleur": "^3.0.3",
+    "jest": "^26.4.2",
+    "jest-cli": "^26.4.2",
+    "kleur": "^4.1.1",
     "lolex": "^6.0.0",
     "moleculer": "^0.13.11",
     "moleculer-docgen": "^0.2.2",
-    "nodemon": "^2.0.3",
+    "nodemon": "^2.0.4",
     "npm-check": "^5.9.2"
   },
   "jest": {
@@ -52,7 +52,7 @@
   },
   "dependencies": {
     "bluebird": "^3.7.2",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.20",
     "nedb": "^1.8.0"
   }
 }
