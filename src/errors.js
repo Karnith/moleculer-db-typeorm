@@ -17,7 +17,6 @@ const { MoleculerClientError } = require("moleculer").Errors;
  * @extends {MoleculerClientError}
  */
 class EntityNotFoundError extends MoleculerClientError {
-
 	/**
 	 * Creates an instance of EntityNotFoundError.
 	 *
@@ -27,14 +26,13 @@ class EntityNotFoundError extends MoleculerClientError {
 	 */
 	constructor(id) {
 		super("Entity not found", 404, null, {
-			id
+			id,
 		});
 	}
 }
 
-
 module.exports = {
-	EntityNotFoundError
+	EntityNotFoundError,
 
 	//ERR_ENTITY_NOT_FOUND,
 };

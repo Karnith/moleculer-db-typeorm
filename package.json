@@ -28,17 +28,17 @@
     "moleculer": "^0.14.10"
   },
   "devDependencies": {
-    "benchmarkify": "^2.1.2",
-    "coveralls": "^3.1.0",
-    "fakerator": "^0.3.1",
-    "jest": "^26.4.2",
-    "jest-cli": "^26.4.2",
-    "kleur": "^4.1.1",
+    "benchmarkify": "^3.0.0",
+    "coveralls": "^3.1.1",
+    "fakerator": "^0.3.6",
+    "jest": "^29.5.0",
+    "jest-cli": "^29.5.0",
+    "kleur": "^4.1.5",
     "lolex": "^6.0.0",
-    "moleculer": "^0.13.11",
-    "moleculer-docgen": "^0.2.2",
-    "nodemon": "^2.0.4",
-    "npm-check": "^5.9.2"
+    "moleculer": "^0.14.29",
+    "moleculer-docgen": "^0.3.0",
+    "nodemon": "^2.0.22",
+    "npm-check": "^6.0.1"
   },
   "jest": {
     "testEnvironment": "node",
@@ -51,8 +51,9 @@
     "node": ">= 8.x.x"
   },
   "dependencies": {
+    "@seald-io/nedb": "^4.0.1",
     "bluebird": "^3.7.2",
-    "lodash": "^4.17.20",
-    "nedb": "^1.8.0"
+    "flat": "^5.0.2",
+    "lodash": "^4.17.21"
   }
 }

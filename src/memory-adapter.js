@@ -6,9 +6,10 @@
 
 "use strict";
 
-const _ 		= require("lodash");
-const Promise	= require("bluebird");
-const Datastore = require("nedb");
+const _ = require("lodash");
+const Promise = require("bluebird");
+// const Datastore = require("nedb");
+const Datastore = require("@seald-io/nedb");
 
 /**
  * NeDB adapter for `moleculer-db`
@@ -16,7 +17,6 @@ const Datastore = require("nedb");
  * @class MemoryDbAdapter
  */
 class MemoryDbAdapter {
-
 	/**
 	 * Creates an instance of MemoryDbAdapter.
 	 *
@@ -46,13 +46,30 @@ class MemoryDbAdapter {
 	 * @memberof MemoryDbAdapter
 	 */
 	connect() {
-		this.db = new Datastore(this.opts); // in-memory
+		// this.db = new Datastore(this.opts); // in-memory
+		// if (this.opts instanceof Datastore) {}
+		// 	this.db = this.opts; //use preconfigured datastore
+		// else this.db = new Datastore(this.opts); // in-memory
+		this.db =
+			this.opts instanceof Datastore
+				? this.opts
+				: new Datastore(this.opts);
 
-		["loadDatabase", "insert", "findOne", "count", "remove", "ensureIndex", "removeIndex"].forEach(method => {
+		[
+			"loadDatabase",
+			"insert",
+			"findOne",
+			"count",
+			"remove",
+			"ensureIndex",
+			"removeIndex",
+		].forEach((method) => {
 			this.db[method] = Promise.promisify(this.db[method]);
 		});
-		["update"].forEach(method => {
-			this.db[method] = Promise.promisify(this.db[method], { multiArgs: true });
+		["update"].forEach((method) => {
+			this.db[method] = Promise.promisify(this.db[method], {
+				multiArgs: true,
+			});
 		});
 
 		return this.db.loadDatabase();
@@ -88,12 +105,10 @@ class MemoryDbAdapter {
 		return new Promise((resolve, reject) => {
 			this.createCursor(filters).exec((err, docs) => {
 				/* istanbul ignore next */
-				if (err)
-					return reject(err);
+				if (err) return reject(err);
 
 				resolve(docs);
 			});
-
 		});
 	}
 
@@ -130,12 +145,10 @@ class MemoryDbAdapter {
 		return new Promise((resolve, reject) => {
 			this.db.find({ _id: { $in: ids } }).exec((err, docs) => {
 				/* istanbul ignore next */
-				if (err)
-					return reject(err);
+				if (err) return reject(err);
 
 				resolve(docs);
 			});
-
 		});
 	}
 
@@ -155,12 +168,10 @@ class MemoryDbAdapter {
 		return new Promise((resolve, reject) => {
 			this.createCursor(filters).exec((err, docs) => {
 				/* istanbul ignore next */
-				if (err)
-					return reject(err);
+				if (err) return reject(err);
 
 				resolve(docs.length);
 			});
-
 		});
 	}
 
@@ -195,7 +206,9 @@ class MemoryDbAdapter {
 	 * @memberof MemoryDbAdapter
 	 */
 	updateMany(query, update) {
-		return this.db.update(query, update, { multi: true }).then(res => res[0]);
+		return this.db
+			.update(query, update, { multi: true })
+			.then((res) => res[0]);
 	}
 
 	/**
@@ -207,7 +220,9 @@ class MemoryDbAdapter {
 	 * @memberof MemoryDbAdapter
 	 */
 	updateById(_id, update) {
-		return this.db.update({ _id }, update, { returnUpdatedDocs: true }).then(res => res[1]);
+		return this.db
+			.update({ _id }, update, { returnUpdatedDocs: true })
+			.then((res) => res[1]);
 	}
 
 	/**
@@ -276,35 +291,37 @@ class MemoryDbAdapter {
 			if (_.isString(params.search) && params.search !== "") {
 				let fields = [];
 				if (params.searchFields) {
-					fields = _.isString(params.searchFields) ? params.searchFields.split(" ") : params.searchFields;
+					fields = _.isString(params.searchFields)
+						? params.searchFields.split(" ")
+						: params.searchFields;
 				}
 
 				q = this.db.find({
-					$where: function() {
+					$where: function () {
 						let item = this;
-						if (fields.length > 0)
-							item = _.pick(this, fields);
+						if (fields.length > 0) item = _.pick(this, fields);
 
-						const res = _.values(item).find(v => String(v).toLowerCase().indexOf(params.search.toLowerCase()) !== -1);
+						const res = _.values(item).find(
+							(v) =>
+								String(v)
+									.toLowerCase()
+									.indexOf(params.search.toLowerCase()) !== -1
+						);
 
 						return res != null;
-					}
+					},
 				});
 			} else {
-				if (params.query)
-					q = this.db.find(params.query);
-				else
-					q = this.db.find({});
+				if (params.query) q = this.db.find(params.query);
+				else q = this.db.find({});
 			}
 
 			// Sort
 			if (params.sort) {
 				const sortFields = {};
-				params.sort.forEach(field => {
-					if (field.startsWith("-"))
-						sortFields[field.slice(1)] = -1;
-					else
-						sortFields[field] = 1;
+				params.sort.forEach((field) => {
+					if (field.startsWith("-")) sortFields[field.slice(1)] = -1;
+					else sortFields[field] = 1;
 				});
 				q.sort(sortFields);
 			}
@@ -324,13 +341,13 @@ class MemoryDbAdapter {
 	}
 
 	/**
-	* Transforms 'idField' into NeDB's '_id'
-	* @param {Object} entity
-	* @param {String} idField
-	* @memberof MemoryDbAdapter
-	* @returns {Object} Modified entity
-	*/
-	beforeSaveTransformID (entity, idField) {
+	 * Transforms 'idField' into NeDB's '_id'
+	 * @param {Object} entity
+	 * @param {String} idField
+	 * @memberof MemoryDbAdapter
+	 * @returns {Object} Modified entity
+	 */
+	beforeSaveTransformID(entity, idField) {
 		let newEntity = _.cloneDeep(entity);
 
 		if (idField !== "_id" && entity[idField] !== undefined) {
@@ -342,13 +359,13 @@ class MemoryDbAdapter {
 	}
 
 	/**
-	* Transforms NeDB's '_id' into user defined 'idField'
-	* @param {Object} entity
-	* @param {String} idField
-	* @memberof MemoryDbAdapter
-	* @returns {Object} Modified entity
-	*/
-	afterRetrieveTransformID (entity, idField) {
+	 * Transforms NeDB's '_id' into user defined 'idField'
+	 * @param {Object} entity
+	 * @param {String} idField
+	 * @memberof MemoryDbAdapter
+	 * @returns {Object} Modified entity
+	 */
+	afterRetrieveTransformID(entity, idField) {
 		if (idField !== "_id") {
 			entity[idField] = entity["_id"];
 			delete entity._id;

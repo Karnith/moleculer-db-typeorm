@@ -2,9 +2,7 @@
 
 let errors = require("../../src/errors");
 
-
 describe("Test Errors", () => {
-
 	it("test EntityNotFoundError", () => {
 		let err = new errors.EntityNotFoundError(123);
 		expect(err).toBeDefined();
@@ -15,8 +13,7 @@ describe("Test Errors", () => {
 		expect(err.name).toBe("EntityNotFoundError");
 		expect(err.message).toBe("Entity not found");
 		expect(err.data).toEqual({
-			id: 123
+			id: 123,
 		});
 	});
-
 });
