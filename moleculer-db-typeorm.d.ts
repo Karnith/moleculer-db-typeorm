@@ -1,4 +1,4 @@
-declare module "moleculer-db" {
+declare module "moleculer-db-typeorm" {
 	import type { Context, ServiceBroker } from "moleculer";
 	import { Service } from "moleculer";
 

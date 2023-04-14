@@ -1295,19 +1295,19 @@ module.exports = {
 			case "mt":
 				this.adapter.init(this.broker, this);
 				this.logger.warn(
-					"Database connection set to multi-tenant. Use this.connect() to connect to TypeORM connecion and this.disconnect() to close it."
+					`Database ${this.name} connection set to multi-tenant. Use this.connect() to connect to TypeORM connecion and this.disconnect() to close it.`
 				);
 				break;
 			case "standard":
 				this.adapter.init(this.broker, this);
 				this.logger.warn(
-					"Database connection set to standard. Use this.adapter to interact with the database."
+					`Database ${this.name} connection set to standard. Use this.adapter to interact with the database.`
 				);
 				break;
 			default:
 				this.adapter.init(this.broker, this);
 				this.logger.warn(
-					"Database connection set to default. Use this.adapter to interact with the database."
+					`Database ${this.name} connection set to default. Use this.adapter to interact with the database.`
 				);
 				break;
 		}

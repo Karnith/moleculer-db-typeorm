@@ -1,6 +1,6 @@
 {
   "name": "moleculer-db-typeorm",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "description": "Moleculer service to store typeorm entities in database for standard or multi-tenant solutions",
   "main": "index.js",
   "types": "./moleculer-db-typeorm.d.ts",
