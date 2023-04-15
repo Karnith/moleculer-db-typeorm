@@ -1,12 +1,13 @@
 "use strict";
 
-const { ServiceBroker } = require("moleculer");
-const DbService = require("../../src");
-const Adapter = require("../../src/memory-adapter");
+import { ServiceBroker } from "moleculer";
+import * as DbService from "../../src";
+import { default as Adapter } from "../../src/memory-adapter";
 
 describe("Test CRUD methods with idField", () => {
 	// Create broker
 	let broker = new ServiceBroker({
+		// @ts-ignore
 		logger: console,
 		logLevel: "error",
 	});
@@ -25,6 +26,7 @@ describe("Test CRUD methods with idField", () => {
 	);
 
 	beforeAll(() => {
+		// @ts-ignore
 		return broker.start().delay(1000);
 	});
 
@@ -60,7 +62,7 @@ describe("Test CRUD methods with idField", () => {
 	];
 
 	it("should create a new entity", () => {
-		return broker.call("posts.create", posts[0]).then((res) => {
+		return broker.call("posts.create", posts[0]).then((res: any) => {
 			expect(typeof res).toBe("object");
 			expect(res._id).toEqual(undefined);
 			expect(typeof res.myID).toEqual("string");
@@ -82,7 +84,7 @@ describe("Test CRUD methods with idField", () => {
 	it("should create multiple entities", () => {
 		return broker
 			.call("posts.insert", { entities: [posts[1], posts[2]] })
-			.then((res) => {
+			.then((res: any) => {
 				expect(res.length).toBe(2);
 
 				expect(res[0]._id).toEqual(undefined);
@@ -117,13 +119,13 @@ describe("Test CRUD methods with idField", () => {
 	it("should return with the entity mapped by ID", () => {
 		return broker
 			.call("posts.get", { id: posts[1].myID, mapping: true })
-			.then((res) => expect(res[posts[1].myID]).toEqual(posts[1]));
+			.then((res: any) => expect(res[posts[1].myID]).toEqual(posts[1]));
 	});
 
 	it("should return with multiple entity by IDs", () => {
 		return broker
 			.call("posts.get", { id: [posts[2].myID, posts[0].myID] })
-			.then((res) => {
+			.then((res: any) => {
 				expect(res[0]).toEqual(posts[2]);
 				expect(res[1]).toEqual(posts[0]);
 			});
@@ -135,16 +137,18 @@ describe("Test CRUD methods with idField", () => {
 				id: [posts[2].myID, posts[0].myID],
 				mapping: true,
 			})
-			.then((res) => {
+			.then((res: any) => {
 				expect(res[posts[2].myID]).toEqual(posts[2]);
 				expect(res[posts[0].myID]).toEqual(posts[0]);
 			});
 	});
 
 	it("should find filtered entities (search)", () => {
-		return broker.call("posts.find", { search: "first" }).then((res) => {
-			expect(res[0]).toEqual(posts[0]);
-		});
+		return broker
+			.call("posts.find", { search: "first" })
+			.then((res: any) => {
+				expect(res[0]).toEqual(posts[0]);
+			});
 	});
 
 	it("should update an entity", () => {
@@ -155,7 +159,7 @@ describe("Test CRUD methods with idField", () => {
 				content: "Modify my content",
 				votes: 8,
 			})
-			.then((res) => {
+			.then((res: any) => {
 				expect(res.myID).toEqual(posts[1].myID);
 				expect(res.title).toEqual("Other title");
 				expect(res.content).toEqual("Modify my content");
@@ -164,19 +168,21 @@ describe("Test CRUD methods with idField", () => {
 	});
 
 	it("should find filtered entities (sort)", () => {
-		return broker.call("posts.find", { sort: "-votes" }).then((res) => {
-			expect(res.length).toBe(3);
+		return broker
+			.call("posts.find", { sort: "-votes" })
+			.then((res: any) => {
+				expect(res.length).toBe(3);
 
-			expect(res[0].myID).toEqual(posts[1].myID);
-			expect(res[1].myID).toEqual(posts[0].myID);
-			expect(res[2].myID).toEqual(posts[2].myID);
-		});
+				expect(res[0].myID).toEqual(posts[1].myID);
+				expect(res[1].myID).toEqual(posts[0].myID);
+				expect(res[2].myID).toEqual(posts[2].myID);
+			});
 	});
 
 	it("should find filtered entities (limit, offset)", () => {
 		return broker
 			.call("posts.find", { sort: "votes", limit: "2", offset: 1 })
-			.then((res) => {
+			.then((res: any) => {
 				expect(res.length).toBe(2);
 				expect(res[0].myID).toEqual(posts[0].myID);
 				expect(res[1].myID).toEqual(posts[1].myID);
@@ -186,7 +192,7 @@ describe("Test CRUD methods with idField", () => {
 	it("should find filtered entities (search)", () => {
 		return broker
 			.call("posts.find", { search: "post", sort: "-votes" })
-			.then((res) => {
+			.then((res: any) => {
 				expect(res.length).toBe(2);
 				expect(res[0].myID).toEqual(posts[0].myID);
 				expect(res[1].myID).toEqual(posts[2].myID);
@@ -200,7 +206,7 @@ describe("Test CRUD methods with idField", () => {
 				searchFields: ["title"],
 				sort: "-votes",
 			})
-			.then((res) => {
+			.then((res: any) => {
 				expect(res.length).toBe(2);
 				expect(res[0].myID).toEqual(posts[0].myID);
 				expect(res[1].myID).toEqual(posts[2].myID);
@@ -208,25 +214,29 @@ describe("Test CRUD methods with idField", () => {
 	});
 
 	it("should list paginated entities", () => {
-		return broker.call("posts.list", { sort: "-votes" }).then((res) => {
-			expect(res.page).toBe(1);
-			expect(res.pageSize).toBe(10);
-			expect(res.total).toBe(3);
-			expect(res.totalPages).toBe(1);
+		return broker
+			.call("posts.list", { sort: "-votes" })
+			.then((res: any) => {
+				expect(res.page).toBe(1);
+				expect(res.pageSize).toBe(10);
+				expect(res.total).toBe(3);
+				expect(res.totalPages).toBe(1);
 
-			expect(res.rows.length).toBe(3);
-			expect(res.rows[0].myID).toEqual(posts[1].myID);
-			expect(res.rows[1].myID).toEqual(posts[0].myID);
-			expect(res.rows[2].myID).toEqual(posts[2].myID);
-		});
+				expect(res.rows.length).toBe(3);
+				expect(res.rows[0].myID).toEqual(posts[1].myID);
+				expect(res.rows[1].myID).toEqual(posts[0].myID);
+				expect(res.rows[2].myID).toEqual(posts[2].myID);
+			});
 	});
 
 	it("should create single entity", () => {
-		return broker.call("posts.insert", { entity: posts[3] }).then((res) => {
-			expect(res).toBeInstanceOf(Object);
-			expect(res._id).toEqual(undefined);
-			expect(typeof res.myID).toEqual("string");
-		});
+		return broker
+			.call("posts.insert", { entity: posts[3] })
+			.then((res: any) => {
+				expect(res).toBeInstanceOf(Object);
+				expect(res._id).toEqual(undefined);
+				expect(typeof res.myID).toEqual("string");
+			});
 	});
 
 	test("should throw an error", () => {
@@ -254,6 +264,7 @@ describe("Test CRUD methods with idField", () => {
 describe("Test CRUD methods with idField and encoding", () => {
 	// Create broker
 	let broker = new ServiceBroker({
+		// @ts-ignore
 		logger: console,
 		logLevel: "error",
 	});
@@ -269,10 +280,10 @@ describe("Test CRUD methods with idField and encoding", () => {
 			},
 			adapter: new Adapter(),
 			methods: {
-				encodeID(id) {
+				encodeID(id: string) {
 					return "enc:" + id;
 				},
-				decodeID(id) {
+				decodeID(id: string) {
 					return id.substring(4);
 				},
 			},
@@ -280,6 +291,7 @@ describe("Test CRUD methods with idField and encoding", () => {
 	);
 
 	beforeAll(() => {
+		// @ts-ignore
 		return broker.start().delay(1000);
 	});
 
@@ -287,7 +299,7 @@ describe("Test CRUD methods with idField and encoding", () => {
 		return broker.stop();
 	});
 
-	const posts = [
+	const posts: any = [
 		{ title: "My first post", content: "This is the content", votes: 2 },
 		{ title: "Second post", content: "Waiting for the next...", votes: 5 },
 		{ title: "My post", content: "This is the end! Good bye!", votes: 0 },
@@ -295,7 +307,7 @@ describe("Test CRUD methods with idField and encoding", () => {
 	];
 
 	it("should create a new entity", () => {
-		return broker.call("posts.create", posts[0]).then((res) => {
+		return broker.call("posts.create", posts[0]).then((res: any) => {
 			expect(typeof res).toBe("object");
 			expect(res._id).toEqual(undefined);
 			expect(typeof res.myID).toEqual("string");
@@ -306,7 +318,7 @@ describe("Test CRUD methods with idField and encoding", () => {
 	it("should create multiple entities", () => {
 		return broker
 			.call("posts.insert", { entities: [posts[1], posts[2]] })
-			.then((res) => {
+			.then((res: any) => {
 				expect(res.length).toBe(2);
 
 				expect(res[0]._id).toEqual(undefined);
@@ -328,13 +340,13 @@ describe("Test CRUD methods with idField and encoding", () => {
 	it("should return with the entity mapped by ID", () => {
 		return broker
 			.call("posts.get", { id: posts[1].myID, mapping: true })
-			.then((res) => expect(res[posts[1].myID]).toEqual(posts[1]));
+			.then((res: any) => expect(res[posts[1].myID]).toEqual(posts[1]));
 	});
 
 	it("should return with multiple entity by IDs", () => {
 		return broker
 			.call("posts.get", { id: [posts[2].myID, posts[0].myID] })
-			.then((res) => {
+			.then((res: any) => {
 				expect(res[0]).toEqual(posts[2]);
 				expect(res[1]).toEqual(posts[0]);
 			});
@@ -346,16 +358,18 @@ describe("Test CRUD methods with idField and encoding", () => {
 				id: [posts[2].myID, posts[0].myID],
 				mapping: true,
 			})
-			.then((res) => {
+			.then((res: any) => {
 				expect(res[posts[2].myID]).toEqual(posts[2]);
 				expect(res[posts[0].myID]).toEqual(posts[0]);
 			});
 	});
 
 	it("should find filtered entities (search)", () => {
-		return broker.call("posts.find", { search: "first" }).then((res) => {
-			expect(res[0]).toEqual(posts[0]);
-		});
+		return broker
+			.call("posts.find", { search: "first" })
+			.then((res: any) => {
+				expect(res[0]).toEqual(posts[0]);
+			});
 	});
 
 	it("should update an entity", () => {
@@ -366,7 +380,7 @@ describe("Test CRUD methods with idField and encoding", () => {
 				content: "Modify my content",
 				votes: 8,
 			})
-			.then((res) => {
+			.then((res: any) => {
 				expect(res.myID).toEqual(posts[1].myID);
 				expect(res.title).toEqual("Other title");
 				expect(res.content).toEqual("Modify my content");
@@ -375,19 +389,21 @@ describe("Test CRUD methods with idField and encoding", () => {
 	});
 
 	it("should find filtered entities (sort)", () => {
-		return broker.call("posts.find", { sort: "-votes" }).then((res) => {
-			expect(res.length).toBe(3);
+		return broker
+			.call("posts.find", { sort: "-votes" })
+			.then((res: any) => {
+				expect(res.length).toBe(3);
 
-			expect(res[0].myID).toEqual(posts[1].myID);
-			expect(res[1].myID).toEqual(posts[0].myID);
-			expect(res[2].myID).toEqual(posts[2].myID);
-		});
+				expect(res[0].myID).toEqual(posts[1].myID);
+				expect(res[1].myID).toEqual(posts[0].myID);
+				expect(res[2].myID).toEqual(posts[2].myID);
+			});
 	});
 
 	it("should find filtered entities (limit, offset)", () => {
 		return broker
 			.call("posts.find", { sort: "votes", limit: "2", offset: 1 })
-			.then((res) => {
+			.then((res: any) => {
 				expect(res.length).toBe(2);
 				expect(res[0].myID).toEqual(posts[0].myID);
 				expect(res[1].myID).toEqual(posts[1].myID);
@@ -397,7 +413,7 @@ describe("Test CRUD methods with idField and encoding", () => {
 	it("should find filtered entities (search)", () => {
 		return broker
 			.call("posts.find", { search: "post", sort: "-votes" })
-			.then((res) => {
+			.then((res: any) => {
 				expect(res.length).toBe(2);
 				expect(res[0].myID).toEqual(posts[0].myID);
 				expect(res[1].myID).toEqual(posts[2].myID);
@@ -411,7 +427,7 @@ describe("Test CRUD methods with idField and encoding", () => {
 				searchFields: ["title"],
 				sort: "-votes",
 			})
-			.then((res) => {
+			.then((res: any) => {
 				expect(res.length).toBe(2);
 				expect(res[0].myID).toEqual(posts[0].myID);
 				expect(res[1].myID).toEqual(posts[2].myID);
@@ -419,26 +435,30 @@ describe("Test CRUD methods with idField and encoding", () => {
 	});
 
 	it("should list paginated entities", () => {
-		return broker.call("posts.list", { sort: "-votes" }).then((res) => {
-			expect(res.page).toBe(1);
-			expect(res.pageSize).toBe(10);
-			expect(res.total).toBe(3);
-			expect(res.totalPages).toBe(1);
+		return broker
+			.call("posts.list", { sort: "-votes" })
+			.then((res: any) => {
+				expect(res.page).toBe(1);
+				expect(res.pageSize).toBe(10);
+				expect(res.total).toBe(3);
+				expect(res.totalPages).toBe(1);
 
-			expect(res.rows.length).toBe(3);
-			expect(res.rows[0].myID).toEqual(posts[1].myID);
-			expect(res.rows[1].myID).toEqual(posts[0].myID);
-			expect(res.rows[2].myID).toEqual(posts[2].myID);
-		});
+				expect(res.rows.length).toBe(3);
+				expect(res.rows[0].myID).toEqual(posts[1].myID);
+				expect(res.rows[1].myID).toEqual(posts[0].myID);
+				expect(res.rows[2].myID).toEqual(posts[2].myID);
+			});
 	});
 
 	it("should create single entity", () => {
-		return broker.call("posts.insert", { entity: posts[3] }).then((res) => {
-			expect(res).toBeInstanceOf(Object);
-			expect(res._id).toEqual(undefined);
-			expect(typeof res.myID).toEqual("string");
-			posts[3].myID = res.myID;
-		});
+		return broker
+			.call("posts.insert", { entity: posts[3] })
+			.then((res: any) => {
+				expect(res).toBeInstanceOf(Object);
+				expect(res._id).toEqual(undefined);
+				expect(typeof res.myID).toEqual("string");
+				posts[3].myID = res.myID;
+			});
 	});
 
 	it("should remove entity by ID", () => {

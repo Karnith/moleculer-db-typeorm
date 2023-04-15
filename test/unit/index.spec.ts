@@ -1,11 +1,11 @@
 "use strict";
 
-const { ServiceBroker, Service, Context } = require("moleculer");
-const { ValidationError } = require("moleculer").Errors;
-const DbService = require("../../src");
+import { ServiceBroker, Service, Context, Errors } from "moleculer";
+const ValidationError = Errors.ValidationError;
+import * as DbService from "../../src";
 //const lolex = require("lolex");
 
-function protectReject(err) {
+function protectReject(err: any) {
 	if (err && err.stack) {
 		console.error(err);
 		console.error(err.stack);
@@ -37,7 +37,7 @@ describe("Test DbService actions", () => {
 		afterRetrieveTransformID: jest.fn((obj) => obj),
 	};
 
-	const broker = new ServiceBroker({ logger: false, validation: false });
+	const broker = new ServiceBroker({ logger: false, validator: false });
 	const service = broker.createService(
 		/* DbService, */ {
 			name: "store",
@@ -236,12 +236,15 @@ describe("Test reconnecting", () => {
 	);
 
 	it("should connect after error", () => {
-		return service.schema.started
-			.call(service)
-			.catch(protectReject)
-			.then(() => {
-				expect(adapter.connect).toHaveBeenCalledTimes(2);
-			});
+		return (
+			service.schema
+				// @ts-ignore
+				.started!.call(service)
+				.catch(protectReject)
+				.then(() => {
+					expect(adapter.connect).toHaveBeenCalledTimes(2);
+				})
+		);
 	});
 });
 
@@ -271,7 +274,7 @@ describe("Test DbService methods", () => {
 
 	const broker = new ServiceBroker({
 		logger: false,
-		validation: false,
+		validator: false,
 		cacher: true,
 	});
 	const service = broker.createService(
@@ -289,20 +292,23 @@ describe("Test DbService methods", () => {
 	);
 
 	it("should call 'afterConnected' of schema", () => {
-		return broker
-			.start()
-			.delay(100)
-			.then(() => {
-				expect(afterConnected).toHaveBeenCalledTimes(1);
-				expect(adapter.connect).toHaveBeenCalledTimes(1);
-			})
-			.catch(protectReject);
+		return (
+			broker
+				.start()
+				// @ts-ignore
+				.delay(100)
+				.then(() => {
+					expect(afterConnected).toHaveBeenCalledTimes(1);
+					expect(adapter.connect).toHaveBeenCalledTimes(1);
+				})
+				.catch(protectReject)
+		);
 	});
 
 	it("should call broker.broadcast to clear the cache", () => {
 		broker.broadcast = jest.fn();
 		broker.emit = jest.fn();
-		broker.cacher.clean = jest.fn(() => Promise.resolve());
+		broker.cacher!.clean = jest.fn(() => Promise.resolve());
 
 		return service
 			.clearCache()
@@ -313,8 +319,10 @@ describe("Test DbService methods", () => {
 					"cache.clean.v1.store"
 				);
 
-				expect(broker.cacher.clean).toHaveBeenCalledTimes(1);
-				expect(broker.cacher.clean).toHaveBeenCalledWith("v1.store.**");
+				expect(broker.cacher!.clean).toHaveBeenCalledTimes(1);
+				expect(broker.cacher!.clean).toHaveBeenCalledWith(
+					"v1.store.**"
+				);
 			})
 			.catch(protectReject);
 	});
@@ -323,7 +331,7 @@ describe("Test DbService methods", () => {
 		service.settings.cacheCleanEventType = "emit";
 		broker.broadcast = jest.fn();
 		broker.emit = jest.fn();
-		broker.cacher.clean = jest.fn(() => Promise.resolve());
+		broker.cacher!.clean = jest.fn(() => Promise.resolve());
 
 		return service
 			.clearCache()
@@ -334,8 +342,10 @@ describe("Test DbService methods", () => {
 					"cache.clean.v1.store"
 				);
 
-				expect(broker.cacher.clean).toHaveBeenCalledTimes(1);
-				expect(broker.cacher.clean).toHaveBeenCalledWith("v1.store.**");
+				expect(broker.cacher!.clean).toHaveBeenCalledTimes(1);
+				expect(broker.cacher!.clean).toHaveBeenCalledWith(
+					"v1.store.**"
+				);
 			})
 			.catch(protectReject);
 	});
@@ -349,7 +359,7 @@ describe("Test DbService methods", () => {
 
 			return service
 				.getById(5)
-				.then((res) => {
+				.then((res: any) => {
 					expect(res).toBe(doc);
 
 					expect(service.decodeID).toHaveBeenCalledTimes(0);
@@ -365,7 +375,7 @@ describe("Test DbService methods", () => {
 
 			return service
 				.getById(5, true)
-				.then((res) => {
+				.then((res: any) => {
 					expect(res).toBe(doc);
 
 					expect(service.decodeID).toHaveBeenCalledTimes(1);
@@ -384,7 +394,7 @@ describe("Test DbService methods", () => {
 
 			return service
 				.getById([5, 3, 8], true)
-				.then((res) => {
+				.then((res: any) => {
 					expect(res).toBe(docs);
 
 					expect(service.decodeID).toHaveBeenCalledTimes(3);
@@ -400,18 +410,21 @@ describe("Test DbService methods", () => {
 	});
 
 	it("should call 'disconnect' of adapter", () => {
-		return broker
-			.stop()
-			.delay(100)
-			.then(() => {
-				expect(adapter.disconnect).toHaveBeenCalledTimes(1);
-			})
-			.catch(protectReject);
+		return (
+			broker
+				.stop()
+				// @ts-ignore
+				.delay(100)
+				.then(() => {
+					expect(adapter.disconnect).toHaveBeenCalledTimes(1);
+				})
+				.catch(protectReject)
+		);
 	});
 });
 
 describe("Test entityChanged method", () => {
-	const broker = new ServiceBroker({ logger: false, validation: false });
+	const broker = new ServiceBroker({ logger: false, validator: false });
 	const service = broker.createService(
 		/* DbService, */ {
 			name: "store",
@@ -525,7 +538,7 @@ describe("Test entityChanged method", () => {
 });
 
 describe("Test sanitizeParams method", () => {
-	const broker = new ServiceBroker({ logger: false, validation: false });
+	const broker = new ServiceBroker({ logger: false, validator: false });
 	const service = broker.createService(
 		/* DbService, */ {
 			name: "store",
@@ -641,7 +654,7 @@ describe("Test transformDocuments method", () => {
 	describe("Test with object", () => {
 		const doc = { _id: 1 };
 
-		const broker = new ServiceBroker({ logger: false, validation: false });
+		const broker = new ServiceBroker({ logger: false, validator: false });
 		const service = broker.createService(
 			/* DbService, */ {
 				name: "store",
@@ -659,7 +672,7 @@ describe("Test transformDocuments method", () => {
 			const ctx = { params: {} };
 			return service
 				.transformDocuments(ctx, ctx.params, null)
-				.then((res) => {
+				.then((res: any) => {
 					expect(res).toBe(null);
 					expect(mockAdapter.entityToObject).toHaveBeenCalledTimes(0);
 					expect(service.populateDocs).toHaveBeenCalledTimes(0);
@@ -672,7 +685,7 @@ describe("Test transformDocuments method", () => {
 			const ctx = { params: {} };
 			return service
 				.transformDocuments(ctx, ctx.params, 100)
-				.then((res) => {
+				.then((res: any) => {
 					expect(res).toBe(100);
 					expect(mockAdapter.entityToObject).toHaveBeenCalledTimes(0);
 					expect(service.populateDocs).toHaveBeenCalledTimes(0);
@@ -687,7 +700,7 @@ describe("Test transformDocuments method", () => {
 			const ctx = { params: { populate: ["author"] } };
 			return service
 				.transformDocuments(ctx, ctx.params, doc)
-				.then((res) => {
+				.then((res: any) => {
 					expect(res).toBe(doc);
 
 					expect(mockAdapter.entityToObject).toHaveBeenCalledTimes(1);
@@ -723,7 +736,7 @@ describe("Test transformDocuments method", () => {
 			const ctx = { params: { fields: ["name"] } };
 			return service
 				.transformDocuments(ctx, ctx.params, doc)
-				.then((res) => {
+				.then((res: any) => {
 					expect(res).toBe(doc);
 
 					expect(mockAdapter.entityToObject).toHaveBeenCalledTimes(1);
@@ -748,7 +761,7 @@ describe("Test transformDocuments method", () => {
 	describe("Test with array of object", () => {
 		const docs = [{ _id: 2 }, { _id: 5 }];
 
-		const broker = new ServiceBroker({ logger: false, validation: false });
+		const broker = new ServiceBroker({ logger: false, validator: false });
 		const service = broker.createService(
 			/* DbService, */ {
 				name: "store",
@@ -767,7 +780,7 @@ describe("Test transformDocuments method", () => {
 			const ctx = { params: { populate: ["author"] } };
 			return service
 				.transformDocuments(ctx, ctx.params, docs)
-				.then((res) => {
+				.then((res: any) => {
 					expect(res).toEqual(docs);
 
 					expect(mockAdapter.entityToObject).toHaveBeenCalledTimes(2);
@@ -812,7 +825,7 @@ describe("Test transformDocuments method", () => {
 
 			const broker = new ServiceBroker({
 				logger: false,
-				validation: false,
+				validator: false,
 			});
 			const service = broker.createService(
 				/* DbService, */ {
@@ -826,7 +839,7 @@ describe("Test transformDocuments method", () => {
 				const ctx = { params: { fields: ["a.c"] } };
 				return service
 					.transformDocuments(ctx, ctx.params, docs)
-					.then((res) => {
+					.then((res: any) => {
 						expect(res).toStrictEqual({ a: { c: 7 } });
 					});
 			});
@@ -835,7 +848,7 @@ describe("Test transformDocuments method", () => {
 				const ctx = { params: { excludeFields: ["a.c"] } };
 				return service
 					.transformDocuments(ctx, ctx.params, docs)
-					.then((res) => {
+					.then((res: any) => {
 						expect(res).toStrictEqual({
 							_id: 2,
 							a: {
@@ -857,7 +870,7 @@ describe("Test transformDocuments method", () => {
 				};
 				return service
 					.transformDocuments(ctx, ctx.params, docs)
-					.then((res) => {
+					.then((res: any) => {
 						expect(res).toStrictEqual({
 							a: {
 								b: 6,
@@ -878,7 +891,7 @@ describe("Test transformDocuments method", () => {
 				};
 				return service
 					.transformDocuments(ctx, ctx.params, docs)
-					.then((res) => {
+					.then((res: any) => {
 						expect(res).toStrictEqual({
 							a: {
 								b: 6,
@@ -1040,7 +1053,7 @@ describe("Test filterFields method", () => {
 		},
 	};
 
-	const broker = new ServiceBroker({ logger: false, validation: false });
+	const broker = new ServiceBroker({ logger: false, validator: false });
 	const service = broker.createService(
 		/* DbService, */ {
 			name: "store",
@@ -1092,7 +1105,7 @@ describe("Test excludeFields method", () => {
 		},
 	};
 
-	const broker = new ServiceBroker({ logger: false, validation: false });
+	const broker = new ServiceBroker({ logger: false, validator: false });
 	const service = broker.createService(
 		/* DbService, */ {
 			name: "store",
@@ -1143,7 +1156,7 @@ describe("Test populateDocs method", () => {
 		{ id: 3, author: 8, rate: 5 },
 	];
 
-	const broker = new ServiceBroker({ logger: false, validation: false });
+	const broker = new ServiceBroker({ logger: false, validator: false });
 	const service = broker.createService(
 		/* DbService, */ {
 			name: "store",
@@ -1160,7 +1173,9 @@ describe("Test populateDocs method", () => {
 						},
 					},
 					rate: jest.fn(function (ids, docs) {
-						docs.forEach((doc) => (doc.rate = RATES[doc.rate]));
+						docs.forEach(
+							(doc: any) => (doc.rate = RATES[doc.rate])
+						);
 						return this.Promise.resolve();
 					}),
 				},
@@ -1170,6 +1185,7 @@ describe("Test populateDocs method", () => {
 
 	it("should call 'populateDocs' with rules from settings", () => {
 		const ctx = { params: {} };
+		// @ts-ignore
 		ctx.call = jest
 			.fn(() =>
 				Promise.resolve({
@@ -1185,6 +1201,7 @@ describe("Test populateDocs method", () => {
 				})
 			)
 			.mockImplementationOnce(() =>
+				// @ts-ignore
 				Promise.resolve({
 					8: { id: 8, title: "Lorem" },
 					3: { id: 3, title: "ipsum" },
@@ -1193,13 +1210,16 @@ describe("Test populateDocs method", () => {
 
 		return service
 			.populateDocs(ctx, docs, ["author", "comments", "rate"])
-			.then((res) => {
+			.then((res: any) => {
+				// @ts-ignore
 				expect(ctx.call).toHaveBeenCalledTimes(2);
+				// @ts-ignore
 				expect(ctx.call).toHaveBeenCalledWith("users.get", {
 					fields: "username fullName",
 					id: [3, 5, 8],
 					mapping: true,
 				});
+				// @ts-ignore
 				expect(ctx.call).toHaveBeenCalledWith("comments.get", {
 					id: [8, 3],
 					mapping: true,
@@ -1264,6 +1284,7 @@ describe("Test populateDocs method", () => {
 
 	it("should call 'populateDocs' with multiple doc & only author population", () => {
 		const ctx = { params: {} };
+		// @ts-ignore
 		ctx.call = jest.fn(() =>
 			Promise.resolve({
 				3: {
@@ -1286,7 +1307,7 @@ describe("Test populateDocs method", () => {
 
 		return service
 			.populateDocs(ctx, docs, ["author", "voters"])
-			.then((res) => {
+			.then((res: any) => {
 				expect(res).toEqual([
 					{ author: { name: "Jane" } },
 					{ author: { name: "John" } },
@@ -1299,6 +1320,7 @@ describe("Test populateDocs method", () => {
 
 	it("should call 'populateDocs' with single doc & only author population", () => {
 		const ctx = { params: {} };
+		// @ts-ignore
 		ctx.call = jest.fn(() =>
 			Promise.resolve({
 				3: {
@@ -1316,7 +1338,7 @@ describe("Test populateDocs method", () => {
 
 		return service
 			.populateDocs(ctx, doc, ["author", "voters"])
-			.then((res) => {
+			.then((res: any) => {
 				expect(res).toEqual({ author: { name: "Jane" } });
 			})
 			.catch(protectReject);
@@ -1324,6 +1346,7 @@ describe("Test populateDocs method", () => {
 
 	it("should call 'populateDocs' with single doc & only likes.users population", () => {
 		const ctx = { params: {} };
+		// @ts-ignore
 		ctx.call = jest.fn(() =>
 			Promise.resolve({
 				3: {
@@ -1341,7 +1364,7 @@ describe("Test populateDocs method", () => {
 
 		return service
 			.populateDocs(ctx, doc, ["likes.users"])
-			.then((res) => {
+			.then((res: any) => {
 				expect(res).toEqual({
 					id: 4,
 					likes: {
@@ -1354,12 +1377,12 @@ describe("Test populateDocs method", () => {
 	});
 
 	it("should return docs if no populate list", () => {
-		const docs = [];
+		const docs: Array<any> = [];
 		const ctx = { params: {} };
 
 		return service
 			.populateDocs(ctx, docs)
-			.then((res) => {
+			.then((res: any) => {
 				expect(res).toBe(docs);
 			})
 			.catch(protectReject);
@@ -1371,7 +1394,7 @@ describe("Test populateDocs method", () => {
 
 		return service
 			.populateDocs(ctx, docs, ["author"])
-			.then((res) => {
+			.then((res: any) => {
 				expect(res).toBe(docs);
 			})
 			.catch(protectReject);
@@ -1382,7 +1405,7 @@ describe("Test validateEntity method", () => {
 	describe("Test with custom validator function", () => {
 		const validator = jest.fn();
 
-		const broker = new ServiceBroker({ logger: false, validation: false });
+		const broker = new ServiceBroker({ logger: false, validator: false });
 		const service = broker.createService(
 			/* DbService, */ {
 				name: "store",
@@ -1425,6 +1448,7 @@ describe("Test validateEntity method", () => {
 	describe("Test with built-in validator function", () => {
 		const broker = new ServiceBroker({
 			logger: false,
+			// @ts-ignore
 			validation: {
 				options: { useNewCustomCheckerFunction: true }, // Enable async validations
 			},
@@ -1455,7 +1479,7 @@ describe("Test validateEntity method", () => {
 						id: "number",
 						name: {
 							type: "string",
-							custom: async (value) => {
+							custom: async (value: any) => {
 								return await new Promise((resolve) => {
 									setTimeout(() => {
 										resolve(value);
@@ -1473,7 +1497,7 @@ describe("Test validateEntity method", () => {
 			return service
 				.validateEntity(entity)
 				.catch(protectReject)
-				.then((res) => {
+				.then((res: any) => {
 					expect(res).toBe(entity);
 				});
 		});
@@ -1483,7 +1507,7 @@ describe("Test validateEntity method", () => {
 			return service
 				.validateEntity(entities)
 				.then(protectReject)
-				.catch((err) => {
+				.catch((err: any) => {
 					expect(err).toBeDefined();
 					expect(err).toBeInstanceOf(ValidationError);
 					expect(err.code).toBe(422);
@@ -1500,7 +1524,7 @@ describe("Test validateEntity method", () => {
 			return otherService
 				.validateEntity(entity)
 				.catch(protectReject)
-				.then((res) => {
+				.then((res: any) => {
 					expect(res).toBe(entity);
 				});
 		});
@@ -1510,7 +1534,7 @@ describe("Test validateEntity method", () => {
 			return otherService
 				.validateEntity(entity)
 				.then(protectReject)
-				.catch((err) => {
+				.catch((err: any) => {
 					expect(err).toBeDefined();
 					expect(err).toBeInstanceOf(ValidationError);
 					expect(err.code).toBe(422);
@@ -1524,6 +1548,7 @@ describe("Test validateEntity method", () => {
 });
 
 describe("Test encodeID/decodeID method", () => {
+	// @ts-ignore
 	const broker = new ServiceBroker({ logger: false, validation: false });
 	const service = broker.createService(
 		/* DbService, */ {

@@ -1,10 +1,10 @@
 "use strict";
 
-const { ServiceBroker, Service, Context } = require("moleculer");
-const { ValidationError } = require("moleculer").Errors;
-const DbService = require("../../src");
+import { ServiceBroker } from "moleculer";
+// const { ValidationError } = require("moleculer").Errors;
+import * as DbService from "../../src";
 
-function protectReject(err) {
+function protectReject(err: { stack: any }) {
 	if (err && err.stack) {
 		console.error(err);
 		console.error(err.stack);
@@ -35,7 +35,7 @@ describe("Test DbService actions", () => {
 		beforeSaveTransformID: jest.fn((obj) => obj),
 	};
 
-	const broker = new ServiceBroker({ logger: false, validation: false });
+	const broker = new ServiceBroker({ logger: false, validator: false });
 	const service = broker.createService(
 		/* DbService, */ {
 			name: "store",

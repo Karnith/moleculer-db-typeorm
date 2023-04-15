@@ -1,10 +1,10 @@
 "use strict";
 
-const { ServiceBroker } = require("moleculer");
-const DbService = require("../../src");
-const Adapter = require("../../src/memory-adapter");
+import { ServiceBroker } from "moleculer";
+import * as DbService from "../../src";
+import { default as Adapter } from "../../src/memory-adapter";
 
-function protectReject(err) {
+function protectReject(err: any) {
 	if (err && err.stack) {
 		console.error(err);
 		console.error(err.stack);
@@ -15,6 +15,7 @@ function protectReject(err) {
 describe("Test populates feature", () => {
 	// Create broker
 	let broker = new ServiceBroker({
+		// @ts-ignore
 		logger: console,
 		logLevel: "error",
 	});
@@ -76,7 +77,7 @@ describe("Test populates feature", () => {
 		}
 	);
 
-	let posts = [
+	let posts: any = [
 		{ title: "My first post", content: "This is the content", votes: 2 },
 		{ title: "Second post", content: "Waiting for the next...", votes: 0 },
 		{
@@ -86,50 +87,64 @@ describe("Test populates feature", () => {
 		},
 	];
 
-	let users = [
+	let users: any = [
 		{ username: "john", name: "John", password: "123456" },
 		{ username: "jane", name: "Jane", password: "password" },
 		{ username: "walter", name: "Walter", password: "H31s3nb3rg" },
 	];
 
-	let groups = [{ name: "groupA" }, { name: "groupB" }, { name: "groupC" }];
+	let groups: any = [
+		{ name: "groupA" },
+		{ name: "groupB" },
+		{ name: "groupC" },
+	];
 
-	beforeAll(() => {
-		return broker.start().then(() => {
-			return broker
-				.call("groups.insert", { entities: groups })
-				.then((res) => {
-					res.forEach((e, i) => (groups[i]._id = e._id));
-
-					users[0].group = res[0]._id;
-					users[1].group = res[1]._id;
-					users[2].group = res[2]._id;
-
-					return broker
-						.call("users.insert", { entities: users })
-						.then((res) => {
-							res.forEach((e, i) => (users[i]._id = e._id));
-
-							posts[0].author = res[2]._id;
-							posts[0].reviewerId = res[0]._id;
-							posts[0].liked = { by: res[0]._id };
-							posts[1].author = res[0]._id;
-							posts[1].reviewerId = res[0]._id;
-							posts[1].liked = { by: res[0]._id };
-							posts[2].author = res[1]._id;
-							posts[2].reviewerId = res[0]._id;
-							posts[2].liked = { by: res[0]._id };
-
-							return broker
-								.call("posts.insert", { entities: posts })
-								.then((res) => {
-									res.forEach(
-										(e, i) => (posts[i]._id = e._id)
-									);
-								});
-						});
-				});
+	beforeAll(async () => {
+		await broker.start();
+		const res: any = await broker.call("groups.insert", {
+			entities: groups,
 		});
+		res.forEach(
+			(e: { _id: any }, i: string | number) => (groups[i]._id = e._id)
+		);
+		//@ts-ignore
+		users[0].group = res[0]._id;
+		//@ts-ignore
+		users[1].group = res[1]._id;
+		//@ts-ignore
+		users[2].group = res[2]._id;
+		const res_1: any = await broker.call("users.insert", {
+			entities: users,
+		});
+		res_1.forEach(
+			(e_1: { _id: any }, i_1: string | number) =>
+				(users[i_1]._id = e_1._id)
+		);
+		//@ts-ignore
+		posts[0].author = res_1[2]._id;
+		//@ts-ignore
+		posts[0].reviewerId = res_1[0]._id;
+		//@ts-ignore
+		posts[0].liked = { by: res_1[0]._id };
+		//@ts-ignore
+		posts[1].author = res_1[0]._id;
+		//@ts-ignore
+		posts[1].reviewerId = res_1[0]._id;
+		//@ts-ignore
+		posts[1].liked = { by: res_1[0]._id };
+		//@ts-ignore
+		posts[2].author = res_1[1]._id;
+		//@ts-ignore
+		posts[2].reviewerId = res_1[0]._id;
+		//@ts-ignore
+		posts[2].liked = { by: res_1[0]._id };
+		const res_2: any = await broker.call("posts.insert", {
+			entities: posts,
+		});
+		res_2.forEach(
+			(e_2: { _id: any }, i_2: string | number) =>
+				(posts[i_2]._id = e_2._id)
+		);
 	});
 
 	it("should return with count of entities", () => {
@@ -142,29 +157,38 @@ describe("Test populates feature", () => {
 	});
 
 	it("should return with the entity and populate the author, reviewerId", () => {
-		return broker
-			.call("posts.get", { id: posts[0]._id, populate: ["author"] })
-			.catch(protectReject)
-			.then((res) => {
-				expect(res).toEqual({
-					_id: posts[0]._id,
-					author: {
-						_id: users[2]._id,
-						name: "Walter",
-						group: groups[2]._id,
-						username: "walter",
-					},
-					content: "This is the content",
-					title: "My first post",
-					reviewerId: users[0]._id,
-					liked: { by: users[0]._id },
-				});
-			});
+		return (
+			broker
+				//@ts-ignore
+				.call("posts.get", { id: posts[0]._id, populate: ["author"] })
+				.catch(protectReject)
+				.then((res) => {
+					expect(res).toEqual({
+						//@ts-ignore
+						_id: posts[0]._id,
+						author: {
+							//@ts-ignore
+							_id: users[2]._id,
+							name: "Walter",
+							//@ts-ignore
+							group: groups[2]._id,
+							username: "walter",
+						},
+						content: "This is the content",
+						title: "My first post",
+						//@ts-ignore
+						reviewerId: users[0]._id,
+						//@ts-ignore
+						liked: { by: users[0]._id },
+					});
+				})
+		);
 	});
 
 	it("should return with multiple entities by IDs", () => {
 		return broker
 			.call("posts.get", {
+				//@ts-ignore
 				id: [posts[2]._id, posts[0]._id],
 				populate: ["author"],
 				fields: ["title", "author.name"],
@@ -181,13 +205,16 @@ describe("Test populates feature", () => {
 	it("should return with multiple entities as Object", () => {
 		return broker
 			.call("posts.get", {
+				//@ts-ignore
 				id: [posts[2]._id, posts[0]._id],
 				fields: ["title", "votes"],
 				mapping: true,
 			})
 			.catch(protectReject)
-			.then((res) => {
+			.then((res: any) => {
+				//@ts-ignore
 				expect(res[posts[0]._id]).toEqual({ title: "My first post" });
+				//@ts-ignore
 				expect(res[posts[2]._id]).toEqual({ title: "My last post" });
 			});
 	});
@@ -195,28 +222,36 @@ describe("Test populates feature", () => {
 	it("should return with the entity and populate the review instead of reviewerId", () => {
 		return broker
 			.call("posts.get", {
+				//@ts-ignore
 				id: posts[0]._id,
 				populate: ["author", "reviewer"],
 			})
 			.catch(protectReject)
 			.then((res) => {
 				expect(res).toEqual({
+					//@ts-ignore
 					_id: posts[0]._id,
 					author: {
+						//@ts-ignore
 						_id: users[2]._id,
+						//@ts-ignore
 						group: groups[2]._id,
 						name: "Walter",
 						username: "walter",
 					},
+					//@ts-ignore
 					reviewerId: users[0]._id,
 					reviewer: {
+						//@ts-ignore
 						_id: users[0]._id,
+						//@ts-ignore
 						group: groups[0]._id,
 						name: users[0].name,
 						username: users[0].username,
 					},
 					content: "This is the content",
 					title: "My first post",
+					//@ts-ignore
 					liked: { by: users[0]._id },
 				});
 			});
@@ -225,6 +260,7 @@ describe("Test populates feature", () => {
 	it("should deeply populate all groups", () => {
 		return broker
 			.call("posts.get", {
+				//@ts-ignore
 				id: posts[0]._id,
 				populate: [
 					"author.group",
@@ -236,27 +272,35 @@ describe("Test populates feature", () => {
 			.catch(protectReject)
 			.then((res) => {
 				expect(res).toEqual({
+					//@ts-ignore
 					_id: posts[0]._id,
 					author: {
+						//@ts-ignore
 						_id: users[2]._id,
 						name: "Walter",
 						username: "walter",
+						//@ts-ignore
 						group: { _id: groups[2]._id, name: "groupC" },
 					},
+					//@ts-ignore
 					reviewerId: users[0]._id,
 					reviewer: {
+						//@ts-ignore
 						_id: users[0]._id,
 						name: users[0].name,
 						username: users[0].username,
+						//@ts-ignore
 						group: { _id: groups[0]._id, name: "groupA" },
 					},
 					content: "This is the content",
 					title: "My first post",
 					liked: {
 						by: {
+							//@ts-ignore
 							_id: users[0]._id,
 							name: users[0].name,
 							username: users[0].username,
+							//@ts-ignore
 							group: { _id: groups[0]._id, name: "groupA" },
 						},
 					},
@@ -267,28 +311,36 @@ describe("Test populates feature", () => {
 	it("should deeply populate one group", () => {
 		return broker
 			.call("posts.get", {
+				//@ts-ignore
 				id: posts[0]._id,
 				populate: ["author.invalid", "reviewer.group", "title.invalid"],
 			})
 			.catch(protectReject)
 			.then((res) => {
 				expect(res).toEqual({
+					//@ts-ignore
 					_id: posts[0]._id,
 					author: {
+						//@ts-ignore
 						_id: users[2]._id,
 						name: "Walter",
 						username: "walter",
+						//@ts-ignore
 						group: groups[2]._id,
 					},
+					//@ts-ignore
 					reviewerId: users[0]._id,
 					reviewer: {
+						//@ts-ignore
 						_id: users[0]._id,
 						name: users[0].name,
 						username: users[0].username,
+						//@ts-ignore
 						group: { _id: groups[0]._id, name: "groupA" },
 					},
 					content: "This is the content",
 					title: "My first post",
+					//@ts-ignore
 					liked: { by: users[0]._id },
 				});
 			});

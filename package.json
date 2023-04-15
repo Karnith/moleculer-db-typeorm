@@ -2,9 +2,10 @@
   "name": "moleculer-db-typeorm",
   "version": "1.0.0",
   "description": "Moleculer service to store typeorm entities in database for standard or multi-tenant solutions",
-  "main": "index.js",
+  "main": "./dist/index.js",
   "types": "./moleculer-db-typeorm.d.ts",
   "scripts": {
+    "build": "tsc --build tsconfig.json",
     "dev": "nodemon examples/index.js",
     "ci": "jest --watch",
     "test": "jest --coverage",
@@ -28,23 +29,52 @@
     "moleculer": "^0.14.10"
   },
   "devDependencies": {
+    "@types/bluebird": "^3.5.38",
+    "@types/flat": "^5.0.2",
+    "@types/jest": "^29.5.0",
     "benchmarkify": "^3.0.0",
     "coveralls": "^3.1.1",
     "fakerator": "^0.3.6",
     "jest": "^29.5.0",
+    "jest-circus": "^29.5.0",
     "jest-cli": "^29.5.0",
+    "jest-junit": "^16.0.0",
     "kleur": "^4.1.5",
     "lolex": "^6.0.0",
     "moleculer": "^0.14.29",
     "moleculer-docgen": "^0.3.0",
     "nodemon": "^2.0.22",
-    "npm-check": "^6.0.1"
+    "npm-check": "^6.0.1",
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.0.4"
   },
   "jest": {
+    "coverageDirectory": "<rootDir>/coverage",
     "testEnvironment": "node",
     "coveragePathIgnorePatterns": [
       "/node_modules/",
       "/test/services/"
+    ],
+    "reporters": [
+      "default",
+      "jest-junit"
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "transform": {
+      "^.+\\.(ts|tsx)$": [
+        "ts-jest",
+        {
+          "tsconfig": "tsconfig.json",
+          "diagnostics": true
+        }
+      ]
+    },
+    "testMatch": [
+      "**/*.spec.(ts|js)"
     ]
   },
   "engines": {

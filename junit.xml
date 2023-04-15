@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="181" failures="0" errors="0" time="13.551">
+  <testsuite name="Test Errors" errors="0" failures="0" skipped="0" timestamp="2023-04-15T23:28:13" time="8.488" tests="1">
+    <testcase classname="Test Errors test EntityNotFoundError" name="Test Errors test EntityNotFoundError" time="0.015">
+    </testcase>
+  </testsuite>
+  <testsuite name="Test Adapter constructor" errors="0" failures="0" skipped="0" timestamp="2023-04-15T23:28:13" time="8.786" tests="28">
+    <testcase classname="Test Adapter constructor should be created" name="Test Adapter constructor should be created" time="0.005">
+    </testcase>
+    <testcase classname="Test Adapter constructor should be created with opts" name="Test Adapter constructor should be created with opts" time="0.002">
+    </testcase>
+    <testcase classname="Test Adapter constructor should use preconfigured Datastore" name="Test Adapter constructor should use preconfigured Datastore" time="0.024">
+    </testcase>
+    <testcase classname="Test Adapter methods should connect" name="Test Adapter methods should connect" time="0.023">
+    </testcase>
+    <testcase classname="Test Adapter methods should insert a document" name="Test Adapter methods should insert a document" time="0.009">
+    </testcase>
+    <testcase classname="Test Adapter methods should insert multiple document" name="Test Adapter methods should insert multiple document" time="0.009">
+    </testcase>
+    <testcase classname="Test Adapter methods should find by ID" name="Test Adapter methods should find by ID" time="0.006">
+    </testcase>
+    <testcase classname="Test Adapter methods should find one" name="Test Adapter methods should find one" time="0.002">
+    </testcase>
+    <testcase classname="Test Adapter methods should find by multiple ID" name="Test Adapter methods should find by multiple ID" time="0.007">
+    </testcase>
+    <testcase classname="Test Adapter methods should find all without filter" name="Test Adapter methods should find all without filter" time="0.007">
+    </testcase>
+    <testcase classname="Test Adapter methods should find all &apos;name&apos; with raw query" name="Test Adapter methods should find all &apos;name&apos; with raw query" time="0.003">
+    </testcase>
+    <testcase classname="Test Adapter methods should find all &apos;age: 35&apos;" name="Test Adapter methods should find all &apos;age: 35&apos;" time="0.002">
+    </testcase>
+    <testcase classname="Test Adapter methods should find all &apos;Doe&apos;" name="Test Adapter methods should find all &apos;Doe&apos;" time="0.004">
+    </testcase>
+    <testcase classname="Test Adapter methods should find all &apos;Doe&apos; in filtered fields" name="Test Adapter methods should find all &apos;Doe&apos; in filtered fields" time="0.003">
+    </testcase>
+    <testcase classname="Test Adapter methods should find all &apos;walter&apos; in filtered fields" name="Test Adapter methods should find all &apos;walter&apos; in filtered fields" time="0.003">
+    </testcase>
+    <testcase classname="Test Adapter methods should count all &apos;walter&apos; in filtered fields" name="Test Adapter methods should count all &apos;walter&apos; in filtered fields" time="0.002">
+    </testcase>
+    <testcase classname="Test Adapter methods should sort the result" name="Test Adapter methods should sort the result" time="0.002">
+    </testcase>
+    <testcase classname="Test Adapter methods should sort by two fields in array" name="Test Adapter methods should sort by two fields in array" time="0.003">
+    </testcase>
+    <testcase classname="Test Adapter methods should limit &amp; skip the result" name="Test Adapter methods should limit &amp; skip the result" time="0.001">
+    </testcase>
+    <testcase classname="Test Adapter methods should count all entities" name="Test Adapter methods should count all entities" time="0.002">
+    </testcase>
+    <testcase classname="Test Adapter methods should count filtered entities" name="Test Adapter methods should count filtered entities" time="0.001">
+    </testcase>
+    <testcase classname="Test Adapter methods should update a document" name="Test Adapter methods should update a document" time="0.004">
+    </testcase>
+    <testcase classname="Test Adapter methods should update many documents" name="Test Adapter methods should update many documents" time="0.002">
+    </testcase>
+    <testcase classname="Test Adapter methods should remove by ID" name="Test Adapter methods should remove by ID" time="0.002">
+    </testcase>
+    <testcase classname="Test Adapter methods should remove many documents" name="Test Adapter methods should remove many documents" time="0.001">
+    </testcase>
+    <testcase classname="Test Adapter methods should count all entities" name="Test Adapter methods should count all entities" time="0.002">
+    </testcase>
+    <testcase classname="Test Adapter methods should clear all documents" name="Test Adapter methods should clear all documents" time="0.001">
+    </testcase>
+    <testcase classname="Test Adapter methods should disconnect" name="Test Adapter methods should disconnect" time="0.002">
+    </testcase>
+  </testsuite>
+  <testsuite name="Test DbService actions" errors="0" failures="0" skipped="0" timestamp="2023-04-15T23:28:13" time="8.952" tests="13">
+    <testcase classname="Test DbService actions should set default settings" name="Test DbService actions should set default settings" time="0.01">
+    </testcase>
+    <testcase classname="Test DbService actions should called the &apos;init&apos; method of adapter" name="Test DbService actions should called the &apos;init&apos; method of adapter" time="0.002">
+    </testcase>
+    <testcase classname="Test DbService actions should call the &apos;connect&apos; method" name="Test DbService actions should call the &apos;connect&apos; method" time="0.013">
+    </testcase>
+    <testcase classname="Test DbService actions should call the &apos;_find&apos; method" name="Test DbService actions should call the &apos;_find&apos; method" time="0.003">
+    </testcase>
+    <testcase classname="Test DbService actions should call the &apos;_find&apos; method with params" name="Test DbService actions should call the &apos;_find&apos; method with params" time="0.002">
+    </testcase>
+    <testcase classname="Test DbService actions should call the &apos;list&apos; method" name="Test DbService actions should call the &apos;list&apos; method" time="0.002">
+    </testcase>
+    <testcase classname="Test DbService actions should call the &apos;count&apos; method" name="Test DbService actions should call the &apos;count&apos; method" time="0.003">
+    </testcase>
+    <testcase classname="Test DbService actions should call the &apos;count&apos; method with pagination params" name="Test DbService actions should call the &apos;count&apos; method with pagination params" time="0.003">
+    </testcase>
+    <testcase classname="Test DbService actions should call the &apos;create&apos; method" name="Test DbService actions should call the &apos;create&apos; method" time="0.002">
+    </testcase>
+    <testcase classname="Test DbService actions should call the &apos;insert&apos; method" name="Test DbService actions should call the &apos;insert&apos; method" time="0.002">
+    </testcase>
+    <testcase classname="Test DbService actions should call the &apos;get&apos; method" name="Test DbService actions should call the &apos;get&apos; method" time="0.002">
+    </testcase>
+    <testcase classname="Test DbService actions should call the &apos;update&apos; method" name="Test DbService actions should call the &apos;update&apos; method" time="0.002">
+    </testcase>
+    <testcase classname="Test DbService actions should call the &apos;remove&apos; method" name="Test DbService actions should call the &apos;remove&apos; method" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="Test DbService methods" errors="0" failures="0" skipped="0" timestamp="2023-04-15T23:28:13" time="9.237" tests="10">
+    <testcase classname="Test DbService methods should call &apos;afterConnected&apos; of schema" name="Test DbService methods should call &apos;afterConnected&apos; of schema" time="0.158">
+    </testcase>
+    <testcase classname="Test DbService methods Test `_find` method should call adapter.find &amp; transformDocuments" name="Test DbService methods Test `_find` method should call adapter.find &amp; transformDocuments" time="0.007">
+    </testcase>
+    <testcase classname="Test DbService methods Test `_count` method should call adapter.count without params" name="Test DbService methods Test `_count` method should call adapter.count without params" time="0.004">
+    </testcase>
+    <testcase classname="Test DbService methods Test `_list` method should call adapter.find, count &amp; transformDocuments" name="Test DbService methods Test `_list` method should call adapter.find, count &amp; transformDocuments" time="0.013">
+    </testcase>
+    <testcase classname="Test DbService methods Test `_create` method should call adapter.insert" name="Test DbService methods Test `_create` method should call adapter.insert" time="0.007">
+    </testcase>
+    <testcase classname="Test DbService methods Test `_insert` method should call adapter.insert" name="Test DbService methods Test `_insert` method should call adapter.insert" time="0.008">
+    </testcase>
+    <testcase classname="Test DbService methods Test `_insert` method should call adapter.insertMany" name="Test DbService methods Test `_insert` method should call adapter.insertMany" time="0.007">
+    </testcase>
+    <testcase classname="Test DbService methods Test `_update` method should call adapter.updateById" name="Test DbService methods Test `_update` method should call adapter.updateById" time="0.008">
+    </testcase>
+    <testcase classname="Test DbService methods Test `_update` method should use dot notation if specified" name="Test DbService methods Test `_update` method should use dot notation if specified" time="0.006">
+    </testcase>
+    <testcase classname="Test DbService methods Test `_remove` method should call adapter.remove" name="Test DbService methods Test `_remove` method should call adapter.remove" time="0.006">
+    </testcase>
+  </testsuite>
+  <testsuite name="Test populates feature" errors="0" failures="0" skipped="0" timestamp="2023-04-15T23:28:13" time="9.355" tests="7">
+    <testcase classname="Test populates feature should return with count of entities" name="Test populates feature should return with count of entities" time="0.008">
+    </testcase>
+    <testcase classname="Test populates feature should return with the entity and populate the author, reviewerId" name="Test populates feature should return with the entity and populate the author, reviewerId" time="0.018">
+    </testcase>
+    <testcase classname="Test populates feature should return with multiple entities by IDs" name="Test populates feature should return with multiple entities by IDs" time="0.012">
+    </testcase>
+    <testcase classname="Test populates feature should return with multiple entities as Object" name="Test populates feature should return with multiple entities as Object" time="0.003">
+    </testcase>
+    <testcase classname="Test populates feature should return with the entity and populate the review instead of reviewerId" name="Test populates feature should return with the entity and populate the review instead of reviewerId" time="0.006">
+    </testcase>
+    <testcase classname="Test populates feature should deeply populate all groups" name="Test populates feature should deeply populate all groups" time="0.013">
+    </testcase>
+    <testcase classname="Test populates feature should deeply populate one group" name="Test populates feature should deeply populate one group" time="0.008">
+    </testcase>
+  </testsuite>
+  <testsuite name="Test CRUD methods" errors="0" failures="0" skipped="0" timestamp="2023-04-15T23:28:13" time="10.248" tests="21">
+    <testcase classname="Test CRUD methods should create a new entity" name="Test CRUD methods should create a new entity" time="0.011">
+    </testcase>
+    <testcase classname="Test CRUD methods should create multiple entities" name="Test CRUD methods should create multiple entities" time="0.011">
+    </testcase>
+    <testcase classname="Test CRUD methods should throw error is params is empty" name="Test CRUD methods should throw error is params is empty" time="0.008">
+    </testcase>
+    <testcase classname="Test CRUD methods should return with count of entities" name="Test CRUD methods should return with count of entities" time="0.006">
+    </testcase>
+    <testcase classname="Test CRUD methods should return with the entity by ID" name="Test CRUD methods should return with the entity by ID" time="0.003">
+    </testcase>
+    <testcase classname="Test CRUD methods should throw error if entity not found" name="Test CRUD methods should throw error if entity not found" time="0.002">
+    </testcase>
+    <testcase classname="Test CRUD methods should return with multiple entity by IDs" name="Test CRUD methods should return with multiple entity by IDs" time="0.001">
+    </testcase>
+    <testcase classname="Test CRUD methods should find filtered entities (search)" name="Test CRUD methods should find filtered entities (search)" time="0.002">
+    </testcase>
+    <testcase classname="Test CRUD methods should update an entity" name="Test CRUD methods should update an entity" time="0.004">
+    </testcase>
+    <testcase classname="Test CRUD methods should find filtered entities (sort)" name="Test CRUD methods should find filtered entities (sort)" time="0.002">
+    </testcase>
+    <testcase classname="Test CRUD methods should find filtered entities (limit, offset)" name="Test CRUD methods should find filtered entities (limit, offset)" time="0.002">
+    </testcase>
+    <testcase classname="Test CRUD methods should find filtered entities (max limit)" name="Test CRUD methods should find filtered entities (max limit)" time="0.001">
+    </testcase>
+    <testcase classname="Test CRUD methods should find filtered entities (search)" name="Test CRUD methods should find filtered entities (search)" time="0.001">
+    </testcase>
+    <testcase classname="Test CRUD methods should find filtered entities (search)" name="Test CRUD methods should find filtered entities (search)" time="0.002">
+    </testcase>
+    <testcase classname="Test CRUD methods should list paginated entities" name="Test CRUD methods should list paginated entities" time="0.003">
+    </testcase>
+    <testcase classname="Test CRUD methods should list paginated entities (page 2 &amp; search)" name="Test CRUD methods should list paginated entities (page 2 &amp; search)" time="0.002">
+    </testcase>
+    <testcase classname="Test CRUD methods should list paginated entities (page, pageSize as strings)" name="Test CRUD methods should list paginated entities (page, pageSize as strings)" time="0.002">
+    </testcase>
+    <testcase classname="Test CRUD methods should remove entity by ID" name="Test CRUD methods should remove entity by ID" time="0.002">
+    </testcase>
+    <testcase classname="Test CRUD methods should throw 404 because entity is not exist (remove)" name="Test CRUD methods should throw 404 because entity is not exist (remove)" time="0.002">
+    </testcase>
+    <testcase classname="Test CRUD methods should throw 404 because entity is not exist (update)" name="Test CRUD methods should throw 404 because entity is not exist (update)" time="0.003">
+    </testcase>
+    <testcase classname="Test CRUD methods should return with count of entities" name="Test CRUD methods should return with count of entities" time="0">
+    </testcase>
+  </testsuite>
+  <testsuite name="Test DbService actions" errors="0" failures="0" skipped="0" timestamp="2023-04-15T23:28:13" time="11.056" tests="68">
+    <testcase classname="Test DbService actions should set default settings" name="Test DbService actions should set default settings" time="0.009">
+    </testcase>
+    <testcase classname="Test DbService actions should called the &apos;init&apos; method of adapter" name="Test DbService actions should called the &apos;init&apos; method of adapter" time="0.002">
+    </testcase>
+    <testcase classname="Test DbService actions should call the &apos;connect&apos; method" name="Test DbService actions should call the &apos;connect&apos; method" time="0.009">
+    </testcase>
+    <testcase classname="Test DbService actions should call the &apos;getById&apos; method" name="Test DbService actions should call the &apos;getById&apos; method" time="0.006">
+    </testcase>
+    <testcase classname="Test DbService actions should call the &apos;getById&apos; method with multi IDs, and should convert the result to object" name="Test DbService actions should call the &apos;getById&apos; method with multi IDs, and should convert the result to object" time="0.007">
+    </testcase>
+    <testcase classname="Test DbService actions should call the &apos;getById&apos; method with single ID, and should convert the result to object" name="Test DbService actions should call the &apos;getById&apos; method with single ID, and should convert the result to object" time="0.005">
+    </testcase>
+    <testcase classname="Test DbService actions should call the &apos;disconnect&apos; method" name="Test DbService actions should call the &apos;disconnect&apos; method" time="0.114">
+    </testcase>
+    <testcase classname="Test reconnecting should connect after error" name="Test reconnecting should connect after error" time="1.008">
+    </testcase>
+    <testcase classname="Test DbService methods should call &apos;afterConnected&apos; of schema" name="Test DbService methods should call &apos;afterConnected&apos; of schema" time="0.11">
+    </testcase>
+    <testcase classname="Test DbService methods should call broker.broadcast to clear the cache" name="Test DbService methods should call broker.broadcast to clear the cache" time="0.002">
+    </testcase>
+    <testcase classname="Test DbService methods should call broker.emit to clear the cache" name="Test DbService methods should call broker.emit to clear the cache" time="0.001">
+    </testcase>
+    <testcase classname="Test DbService methods Test `this.getById` method call with one ID without encoding" name="Test DbService methods Test `this.getById` method call with one ID without encoding" time="0.012">
+    </testcase>
+    <testcase classname="Test DbService methods Test `this.getById` method call with one ID and encoding" name="Test DbService methods Test `this.getById` method call with one ID and encoding" time="0.002">
+    </testcase>
+    <testcase classname="Test DbService methods Test `this.getById` method call with multi IDs" name="Test DbService methods Test `this.getById` method call with multi IDs" time="0.002">
+    </testcase>
+    <testcase classname="Test DbService methods should call &apos;disconnect&apos; of adapter" name="Test DbService methods should call &apos;disconnect&apos; of adapter" time="0.216">
+    </testcase>
+    <testcase classname="Test entityChanged method should call `beforeEntityCreate` event" name="Test entityChanged method should call `beforeEntityCreate` event" time="0.002">
+    </testcase>
+    <testcase classname="Test entityChanged method should call `beforeEntityUpdate` event" name="Test entityChanged method should call `beforeEntityUpdate` event" time="0.001">
+    </testcase>
+    <testcase classname="Test entityChanged method should call `beforeEntityRemove` event" name="Test entityChanged method should call `beforeEntityRemove` event" time="0.001">
+    </testcase>
+    <testcase classname="Test entityChanged method should call `entityCreated` event" name="Test entityChanged method should call `entityCreated` event" time="0">
+    </testcase>
+    <testcase classname="Test entityChanged method should call `entityUpdated` event" name="Test entityChanged method should call `entityUpdated` event" time="0">
+    </testcase>
+    <testcase classname="Test entityChanged method should call `entityRemoved` event" name="Test entityChanged method should call `entityRemoved` event" time="0.001">
+    </testcase>
+    <testcase classname="Test sanitizeParams method should not touch the params" name="Test sanitizeParams method should not touch the params" time="0.001">
+    </testcase>
+    <testcase classname="Test sanitizeParams method should convert limit &amp; offset to number" name="Test sanitizeParams method should convert limit &amp; offset to number" time="0">
+    </testcase>
+    <testcase classname="Test sanitizeParams method should convert page &amp; pageSize to number" name="Test sanitizeParams method should convert page &amp; pageSize to number" time="0.001">
+    </testcase>
+    <testcase classname="Test sanitizeParams method should convert sort to array" name="Test sanitizeParams method should convert sort to array" time="0">
+    </testcase>
+    <testcase classname="Test sanitizeParams method should convert fields to array" name="Test sanitizeParams method should convert fields to array" time="0.001">
+    </testcase>
+    <testcase classname="Test sanitizeParams method should convert excludeFields to array" name="Test sanitizeParams method should convert excludeFields to array" time="0.001">
+    </testcase>
+    <testcase classname="Test sanitizeParams method should convert populate to array" name="Test sanitizeParams method should convert populate to array" time="0">
+    </testcase>
+    <testcase classname="Test sanitizeParams method should convert searchFields to array" name="Test sanitizeParams method should convert searchFields to array" time="0.001">
+    </testcase>
+    <testcase classname="Test sanitizeParams method should parse query to object" name="Test sanitizeParams method should parse query to object" time="0">
+    </testcase>
+    <testcase classname="Test sanitizeParams method should fill pagination fields" name="Test sanitizeParams method should fill pagination fields" time="0">
+    </testcase>
+    <testcase classname="Test sanitizeParams method should calc limit &amp; offset from pagination fields" name="Test sanitizeParams method should calc limit &amp; offset from pagination fields" time="0">
+    </testcase>
+    <testcase classname="Test sanitizeParams method should limit the pageSize" name="Test sanitizeParams method should limit the pageSize" time="0">
+    </testcase>
+    <testcase classname="Test sanitizeParams method should limit the limit" name="Test sanitizeParams method should limit the limit" time="0.001">
+    </testcase>
+    <testcase classname="Test transformDocuments method Test with object should not call anything if the docs is null" name="Test transformDocuments method Test with object should not call anything if the docs is null" time="0.003">
+    </testcase>
+    <testcase classname="Test transformDocuments method Test with object should not call anything if the docs is a Number" name="Test transformDocuments method Test with object should not call anything if the docs is a Number" time="0.002">
+    </testcase>
+    <testcase classname="Test transformDocuments method Test with object should call &apos;populateDocs&apos; &amp; filterFields methods" name="Test transformDocuments method Test with object should call &apos;populateDocs&apos; &amp; filterFields methods" time="0.003">
+    </testcase>
+    <testcase classname="Test transformDocuments method Test with object should not call &apos;populateDocs&apos; but filterFields methods" name="Test transformDocuments method Test with object should not call &apos;populateDocs&apos; but filterFields methods" time="0.002">
+    </testcase>
+    <testcase classname="Test transformDocuments method Test with array of object should call &apos;populateDocs&apos; &amp; filterFields methods" name="Test transformDocuments method Test with array of object should call &apos;populateDocs&apos; &amp; filterFields methods" time="0.002">
+    </testcase>
+    <testcase classname="Test transformDocuments method Test excludeFields Test with object should return expected - fields" name="Test transformDocuments method Test excludeFields Test with object should return expected - fields" time="0.002">
+    </testcase>
+    <testcase classname="Test transformDocuments method Test excludeFields Test with object should return expected - excludeFields" name="Test transformDocuments method Test excludeFields Test with object should return expected - excludeFields" time="0.001">
+    </testcase>
+    <testcase classname="Test transformDocuments method Test excludeFields Test with object should return expected - fields &amp; excludeFields" name="Test transformDocuments method Test excludeFields Test with object should return expected - fields &amp; excludeFields" time="0.001">
+    </testcase>
+    <testcase classname="Test transformDocuments method Test excludeFields Test with object should return expected - fields &amp; excludeFields - deep" name="Test transformDocuments method Test excludeFields Test with object should return expected - fields &amp; excludeFields - deep" time="0.001">
+    </testcase>
+    <testcase classname="Test authorizeFields method Test with nested fields should remove the email &amp; password" name="Test authorizeFields method Test with nested fields should remove the email &amp; password" time="0.001">
+    </testcase>
+    <testcase classname="Test authorizeFields method Test with nested fields should remove the email" name="Test authorizeFields method Test with nested fields should remove the email" time="0.001">
+    </testcase>
+    <testcase classname="Test authorizeFields method Test with nested fields should remove the disabled bio fields" name="Test authorizeFields method Test with nested fields should remove the disabled bio fields" time="0">
+    </testcase>
+    <testcase classname="Test authorizeFields method Test with nested fields should return empty" name="Test authorizeFields method Test with nested fields should return empty" time="0">
+    </testcase>
+    <testcase classname="Test authorizeFields method Test with enabled nested fields should fill the nested enabled fields" name="Test authorizeFields method Test with enabled nested fields should fill the nested enabled fields" time="0">
+    </testcase>
+    <testcase classname="Test filterFields method should not touch the doc" name="Test filterFields method should not touch the doc" time="0.001">
+    </testcase>
+    <testcase classname="Test filterFields method should filter the fields" name="Test filterFields method should filter the fields" time="0">
+    </testcase>
+    <testcase classname="Test filterFields method should filter with nested fields" name="Test filterFields method should filter with nested fields" time="0.001">
+    </testcase>
+    <testcase classname="Test excludeFields method should not touch the doc" name="Test excludeFields method should not touch the doc" time="0">
+    </testcase>
+    <testcase classname="Test excludeFields method should exclude fields" name="Test excludeFields method should exclude fields" time="0.001">
+    </testcase>
+    <testcase classname="Test excludeFields method should work with nested fields" name="Test excludeFields method should work with nested fields" time="0">
+    </testcase>
+    <testcase classname="Test populateDocs method should call &apos;populateDocs&apos; with rules from settings" name="Test populateDocs method should call &apos;populateDocs&apos; with rules from settings" time="0.005">
+    </testcase>
+    <testcase classname="Test populateDocs method should call &apos;populateDocs&apos; with multiple doc &amp; only author population" name="Test populateDocs method should call &apos;populateDocs&apos; with multiple doc &amp; only author population" time="0.001">
+    </testcase>
+    <testcase classname="Test populateDocs method should call &apos;populateDocs&apos; with single doc &amp; only author population" name="Test populateDocs method should call &apos;populateDocs&apos; with single doc &amp; only author population" time="0.002">
+    </testcase>
+    <testcase classname="Test populateDocs method should call &apos;populateDocs&apos; with single doc &amp; only likes.users population" name="Test populateDocs method should call &apos;populateDocs&apos; with single doc &amp; only likes.users population" time="0.004">
+    </testcase>
+    <testcase classname="Test populateDocs method should return docs if no populate list" name="Test populateDocs method should return docs if no populate list" time="0">
+    </testcase>
+    <testcase classname="Test populateDocs method should return docs if docs is not array or object" name="Test populateDocs method should return docs if docs is not array or object" time="0.001">
+    </testcase>
+    <testcase classname="Test validateEntity method Test with custom validator function should call &apos;entityValidator&apos;" name="Test validateEntity method Test with custom validator function should call &apos;entityValidator&apos;" time="0.001">
+    </testcase>
+    <testcase classname="Test validateEntity method Test with custom validator function should call &apos;entityValidator&apos; multiple times" name="Test validateEntity method Test with custom validator function should call &apos;entityValidator&apos; multiple times" time="0.002">
+    </testcase>
+    <testcase classname="Test validateEntity method Test with built-in validator function should call validator with correct entity" name="Test validateEntity method Test with built-in validator function should call validator with correct entity" time="0.001">
+    </testcase>
+    <testcase classname="Test validateEntity method Test with built-in validator function should call validator with incorrect entity" name="Test validateEntity method Test with built-in validator function should call validator with incorrect entity" time="0.005">
+    </testcase>
+    <testcase classname="Test validateEntity method Test with built-in validator function should call async validator with correct entity" name="Test validateEntity method Test with built-in validator function should call async validator with correct entity" time="0.017">
+    </testcase>
+    <testcase classname="Test validateEntity method Test with built-in validator function should call async validator with incorrect entity" name="Test validateEntity method Test with built-in validator function should call async validator with incorrect entity" time="0.017">
+    </testcase>
+    <testcase classname="Test encodeID/decodeID method should return with the same ID" name="Test encodeID/decodeID method should return with the same ID" time="0.001">
+    </testcase>
+    <testcase classname="Test encodeID/decodeID method should return with the same ID" name="Test encodeID/decodeID method should return with the same ID" time="0">
+    </testcase>
+  </testsuite>
+  <testsuite name="Test CRUD methods with idField" errors="0" failures="0" skipped="0" timestamp="2023-04-15T23:28:13" time="12.285" tests="33">
+    <testcase classname="Test CRUD methods with idField should create a new entity" name="Test CRUD methods with idField should create a new entity" time="0.012">
+    </testcase>
+    <testcase classname="Test CRUD methods with idField should throw an error" name="Test CRUD methods with idField should throw an error" time="0.006">
+    </testcase>
+    <testcase classname="Test CRUD methods with idField should create multiple entities" name="Test CRUD methods with idField should create multiple entities" time="0.009">
+    </testcase>
+    <testcase classname="Test CRUD methods with idField should throw an error" name="Test CRUD methods with idField should throw an error" time="0.002">
+    </testcase>
+    <testcase classname="Test CRUD methods with idField should return with the entity by ID" name="Test CRUD methods with idField should return with the entity by ID" time="0.004">
+    </testcase>
+    <testcase classname="Test CRUD methods with idField should return with the entity mapped by ID" name="Test CRUD methods with idField should return with the entity mapped by ID" time="0.001">
+    </testcase>
+    <testcase classname="Test CRUD methods with idField should return with multiple entity by IDs" name="Test CRUD methods with idField should return with multiple entity by IDs" time="0.003">
+    </testcase>
+    <testcase classname="Test CRUD methods with idField should return with multiple entities mapped by IDs" name="Test CRUD methods with idField should return with multiple entities mapped by IDs" time="0.005">
+    </testcase>
+    <testcase classname="Test CRUD methods with idField should find filtered entities (search)" name="Test CRUD methods with idField should find filtered entities (search)" time="0.003">
+    </testcase>
+    <testcase classname="Test CRUD methods with idField should update an entity" name="Test CRUD methods with idField should update an entity" time="0.004">
+    </testcase>
+    <testcase classname="Test CRUD methods with idField should find filtered entities (sort)" name="Test CRUD methods with idField should find filtered entities (sort)" time="0.002">
+    </testcase>
+    <testcase classname="Test CRUD methods with idField should find filtered entities (limit, offset)" name="Test CRUD methods with idField should find filtered entities (limit, offset)" time="0.001">
+    </testcase>
+    <testcase classname="Test CRUD methods with idField should find filtered entities (search)" name="Test CRUD methods with idField should find filtered entities (search)" time="0.002">
+    </testcase>
+    <testcase classname="Test CRUD methods with idField should find filtered entities (search)" name="Test CRUD methods with idField should find filtered entities (search)" time="0.003">
+    </testcase>
+    <testcase classname="Test CRUD methods with idField should list paginated entities" name="Test CRUD methods with idField should list paginated entities" time="0.003">
+    </testcase>
+    <testcase classname="Test CRUD methods with idField should create single entity" name="Test CRUD methods with idField should create single entity" time="0.002">
+    </testcase>
+    <testcase classname="Test CRUD methods with idField should throw an error" name="Test CRUD methods with idField should throw an error" time="0.001">
+    </testcase>
+    <testcase classname="Test CRUD methods with idField should remove entity by ID" name="Test CRUD methods with idField should remove entity by ID" time="0.003">
+    </testcase>
+    <testcase classname="Test CRUD methods with idField and encoding should create a new entity" name="Test CRUD methods with idField and encoding should create a new entity" time="0.002">
+    </testcase>
+    <testcase classname="Test CRUD methods with idField and encoding should create multiple entities" name="Test CRUD methods with idField and encoding should create multiple entities" time="0.002">
+    </testcase>
+    <testcase classname="Test CRUD methods with idField and encoding should return with the entity by ID" name="Test CRUD methods with idField and encoding should return with the entity by ID" time="0.001">
+    </testcase>
+    <testcase classname="Test CRUD methods with idField and encoding should return with the entity mapped by ID" name="Test CRUD methods with idField and encoding should return with the entity mapped by ID" time="0.002">
+    </testcase>
+    <testcase classname="Test CRUD methods with idField and encoding should return with multiple entity by IDs" name="Test CRUD methods with idField and encoding should return with multiple entity by IDs" time="0.001">
+    </testcase>
+    <testcase classname="Test CRUD methods with idField and encoding should return with multiple entities mapped by IDs" name="Test CRUD methods with idField and encoding should return with multiple entities mapped by IDs" time="0.002">
+    </testcase>
+    <testcase classname="Test CRUD methods with idField and encoding should find filtered entities (search)" name="Test CRUD methods with idField and encoding should find filtered entities (search)" time="0.001">
+    </testcase>
+    <testcase classname="Test CRUD methods with idField and encoding should update an entity" name="Test CRUD methods with idField and encoding should update an entity" time="0.001">
+    </testcase>
+    <testcase classname="Test CRUD methods with idField and encoding should find filtered entities (sort)" name="Test CRUD methods with idField and encoding should find filtered entities (sort)" time="0.001">
+    </testcase>
+    <testcase classname="Test CRUD methods with idField and encoding should find filtered entities (limit, offset)" name="Test CRUD methods with idField and encoding should find filtered entities (limit, offset)" time="0.001">
+    </testcase>
+    <testcase classname="Test CRUD methods with idField and encoding should find filtered entities (search)" name="Test CRUD methods with idField and encoding should find filtered entities (search)" time="0.001">
+    </testcase>
+    <testcase classname="Test CRUD methods with idField and encoding should find filtered entities (search)" name="Test CRUD methods with idField and encoding should find filtered entities (search)" time="0.002">
+    </testcase>
+    <testcase classname="Test CRUD methods with idField and encoding should list paginated entities" name="Test CRUD methods with idField and encoding should list paginated entities" time="0.002">
+    </testcase>
+    <testcase classname="Test CRUD methods with idField and encoding should create single entity" name="Test CRUD methods with idField and encoding should create single entity" time="0.001">
+    </testcase>
+    <testcase classname="Test CRUD methods with idField and encoding should remove entity by ID" name="Test CRUD methods with idField and encoding should remove entity by ID" time="0.001">
+    </testcase>
+  </testsuite>
+</testsuites>

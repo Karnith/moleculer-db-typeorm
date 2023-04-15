@@ -6,13 +6,27 @@
 
 "use strict";
 
-const _ = require("lodash");
-const Promise = require("bluebird");
-const { flatten } = require("flat");
-const { MoleculerClientError, ValidationError } = require("moleculer").Errors;
-const { EntityNotFoundError } = require("./errors");
-const MemoryAdapter = require("./memory-adapter");
-const pkg = require("../package.json");
+import {
+	capitalize,
+	cloneDeep,
+	compact,
+	flattenDeep,
+	get,
+	isArray,
+	isEmpty,
+	isFunction,
+	isObject,
+	isString,
+	set,
+	uniq,
+	unset,
+} from "lodash";
+import * as BlueBird from "bluebird";
+import { flatten } from "flat";
+import { Context, Errors } from "moleculer";
+import EntityNotFoundError from "./errors";
+import MemoryAdapter from "./memory-adapter";
+import pkg from "../package.json";
 
 /**
  * Service mixin to access database entities
@@ -150,8 +164,10 @@ module.exports = {
 					{ type: "string", optional: true },
 				],
 			},
-			handler(ctx) {
+			handler(ctx: Context): Array<object> {
+				//@ts-ignore
 				let params = this.sanitizeParams(ctx, ctx.params);
+				//@ts-ignore
 				return this._find(ctx, params);
 			},
 		},
@@ -183,8 +199,10 @@ module.exports = {
 					{ type: "string", optional: true },
 				],
 			},
-			handler(ctx) {
+			handler(ctx: Context): number {
+				//@ts-ignore
 				let params = this.sanitizeParams(ctx, ctx.params);
+				//@ts-ignore
 				return this._count(ctx, params);
 			},
 		},
@@ -260,8 +278,10 @@ module.exports = {
 					{ type: "string", optional: true },
 				],
 			},
-			handler(ctx) {
+			handler(ctx: Context): object {
+				//@ts-ignore
 				let params = this.sanitizeParams(ctx, ctx.params);
+				//@ts-ignore
 				return this._list(ctx, params);
 			},
 		},
@@ -277,7 +297,8 @@ module.exports = {
 		 */
 		create: {
 			rest: "POST /",
-			handler(ctx) {
+			handler(ctx: Context): Object {
+				//@ts-ignore
 				return this._create(ctx, ctx.params);
 			},
 		},
@@ -297,7 +318,8 @@ module.exports = {
 				entity: { type: "object", optional: true },
 				entities: { type: "array", optional: true },
 			},
-			handler(ctx) {
+			handler(ctx: Context): Object | Array<Object> {
+				//@ts-ignore
 				return this._insert(ctx, ctx.params);
 			},
 		},
@@ -339,8 +361,10 @@ module.exports = {
 				],
 				mapping: { type: "boolean", optional: true },
 			},
-			handler(ctx) {
+			handler(ctx: Context): Object | Array<Object> {
+				//@ts-ignore
 				let params = this.sanitizeParams(ctx, ctx.params);
+				//@ts-ignore
 				return this._get(ctx, params);
 			},
 		},
@@ -361,7 +385,8 @@ module.exports = {
 			params: {
 				id: { type: "any" },
 			},
-			handler(ctx) {
+			handler(ctx: Context): Object {
+				//@ts-ignore
 				return this._update(ctx, ctx.params);
 			},
 		},
@@ -381,7 +406,8 @@ module.exports = {
 			params: {
 				id: { type: "any" },
 			},
-			handler(ctx) {
+			handler(ctx: Context): number {
+				//@ts-ignore
 				return this._remove(ctx, ctx.params);
 			},
 		},
@@ -415,27 +441,36 @@ module.exports = {
 		 *
 		 * @returns {Connection} returns connection as callback
 		 */
-		connect(mode = this.schema.mode, options, cb) {
-			if (!_.isEmpty(mode)) {
+		//@ts-ignore
+		connect(mode = this.schema.mode, options: any, cb: any): Promise<any> {
+			if (!isEmpty(mode)) {
+				//@ts-ignore
 				return this.adapter.connect(mode, options, cb).then(() => {
 					// Call an 'afterConnected' handler in schema
-					if (_.isFunction(this.schema.afterConnected)) {
+					//@ts-ignore
+					if (isFunction(this.schema.afterConnected)) {
 						try {
+							//@ts-ignore
 							return this.schema.afterConnected.call(this);
 						} catch (err) {
 							/* istanbul ignore next */
+							// @ts-ignore
 							this.logger.error("afterConnected error!", err);
 						}
 					}
 				});
 			} else {
+				//@ts-ignore
 				return this.adapter.connect().then(() => {
 					// Call an 'afterConnected' handler in schema
-					if (_.isFunction(this.schema.afterConnected)) {
+					//@ts-ignore
+					if (isFunction(this.schema.afterConnected)) {
 						try {
+							//@ts-ignore
 							return this.schema.afterConnected.call(this);
 						} catch (err) {
 							/* istanbul ignore next */
+							// @ts-ignore
 							this.logger.error("afterConnected error!", err);
 						}
 					}
@@ -446,8 +481,10 @@ module.exports = {
 		/**
 		 * Disconnect from database.
 		 */
-		disconnect() {
-			if (_.isFunction(this.adapter.disconnect))
+		disconnect(): any {
+			//@ts-ignore
+			if (isFunction(this.adapter.disconnect))
+				//@ts-ignore
 				return this.adapter.disconnect();
 		},
 
@@ -460,7 +497,7 @@ module.exports = {
 		 * @param {Object} params
 		 * @returns {Object}
 		 */
-		sanitizeParams(ctx, params) {
+		sanitizeParams(ctx: Context, params: Record<string, any>): object {
 			let p = Object.assign({}, params);
 
 			// Convert from string to number
@@ -485,8 +522,9 @@ module.exports = {
 			if (typeof p.searchFields === "string")
 				p.searchFields = p.searchFields.split(/[,\s]+/);
 
-			if (ctx.action.name.endsWith(".list")) {
+			if (ctx.action!.name!.endsWith(".list")) {
 				// Default `pageSize`
+				// @ts-ignore
 				if (!p.pageSize) p.pageSize = this.settings.pageSize;
 
 				// Default `page`
@@ -494,9 +532,12 @@ module.exports = {
 
 				// Limit the `pageSize`
 				if (
+					// @ts-ignore
 					this.settings.maxPageSize > 0 &&
+					// @ts-ignore
 					p.pageSize > this.settings.maxPageSize
 				)
+					// @ts-ignore
 					p.pageSize = this.settings.maxPageSize;
 
 				// Calculate the limit & offset from page & pageSize
@@ -504,7 +545,9 @@ module.exports = {
 				p.offset = (p.page - 1) * p.pageSize;
 			}
 			// Limit the `limit`
+			// @ts-ignore
 			if (this.settings.maxLimit > 0 && p.limit > this.settings.maxLimit)
+				// @ts-ignore
 				p.limit = this.settings.maxLimit;
 
 			return p;
@@ -518,13 +561,18 @@ module.exports = {
 		 * @param {Boolean?} decoding - Need to decode IDs.
 		 * @returns {Object|Array<Object>} Found entity(ies).
 		 */
-		getById(id, decoding) {
-			return Promise.resolve().then(() => {
-				if (_.isArray(id)) {
+		async getById(
+			id: any | Array<any>,
+			decoding: boolean | null
+		): Promise<object | object[]> {
+			return await BlueBird.Promise.resolve().then(() => {
+				if (isArray(id)) {
+					// @ts-ignore
 					return this.adapter.findByIds(
 						decoding ? id.map((id) => this.decodeID(id)) : id
 					);
 				} else {
+					// @ts-ignore
 					return this.adapter.findById(
 						decoding ? this.decodeID(id) : id
 					);
@@ -541,12 +589,18 @@ module.exports = {
 		 * @param {Context} ctx
 		 * @returns {Promise}
 		 */
-		beforeEntityChange(type, entity, ctx) {
-			const eventName = `beforeEntity${_.capitalize(type)}`;
+		beforeEntityChange(
+			type: string,
+			entity: object,
+			ctx: Context
+		): Promise<any> {
+			const eventName = `beforeEntity${capitalize(type)}`;
+			// @ts-ignore
 			if (this.schema[eventName] == null) {
-				return Promise.resolve(entity);
+				return BlueBird.Promise.resolve(entity);
 			}
-			return Promise.resolve(
+			return BlueBird.Promise.resolve(
+				// @ts-ignore
 				this.schema[eventName].call(this, entity, ctx)
 			);
 		},
@@ -560,10 +614,16 @@ module.exports = {
 		 * @param {Context} ctx
 		 * @returns {Promise}
 		 */
-		entityChanged(type, json, ctx) {
+		entityChanged(
+			type: string,
+			json: object | Array<object> | number,
+			ctx: Context
+		): Promise<any> {
 			return this.clearCache().then(() => {
-				const eventName = `entity${_.capitalize(type)}`;
+				const eventName = `entity${capitalize(type)}`;
+				// @ts-ignore
 				if (this.schema[eventName] != null) {
+					// @ts-ignore
 					return this.schema[eventName].call(this, json, ctx);
 				}
 			});
@@ -575,13 +635,17 @@ module.exports = {
 		 * @methods
 		 * @returns {Promise}
 		 */
-		clearCache() {
+		clearCache(): Promise<any> {
+			// @ts-ignore
 			this.broker[this.settings.cacheCleanEventType](
+				// @ts-ignore
 				`cache.clean.${this.fullName}`
 			);
+			// @ts-ignore
 			if (this.broker.cacher)
+				// @ts-ignore
 				return this.broker.cacher.clean(`${this.fullName}.**`);
-			return Promise.resolve();
+			return BlueBird.Promise.resolve();
 		},
 
 		/**
@@ -592,36 +656,45 @@ module.exports = {
 		 * @param {Array|Object} docs
 		 * @returns {Array|Object}
 		 */
-		transformDocuments(ctx, params, docs) {
+		transformDocuments(
+			ctx: Context,
+			params: Record<string, any>,
+			docs: Array<any> | object
+		): Promise<Array<any> | object> {
 			let isDoc = false;
 			if (!Array.isArray(docs)) {
-				if (_.isObject(docs)) {
+				if (isObject(docs)) {
 					isDoc = true;
 					docs = [docs];
-				} else return Promise.resolve(docs);
+				} else return BlueBird.Promise.resolve(docs);
 			}
 
 			return (
-				Promise.resolve(docs)
+				BlueBird.Promise.resolve(docs)
 
 					// Convert entity to JS object
 					.then((docs) =>
+						// @ts-ignore
 						docs.map((doc) => this.adapter.entityToObject(doc))
 					)
 
 					// Apply idField
 					.then((docs) =>
-						docs.map((doc) =>
+						docs.map((doc: any) =>
+							// @ts-ignore
 							this.adapter.afterRetrieveTransformID(
 								doc,
+								// @ts-ignore
 								this.settings.idField
 							)
 						)
 					)
 					// Encode IDs
 					.then((docs) =>
-						docs.map((doc) => {
+						docs.map((doc: { [x: string]: any }) => {
+							// @ts-ignore
 							doc[this.settings.idField] = this.encodeID(
+								// @ts-ignore
 								doc[this.settings.idField]
 							);
 							return doc;
@@ -639,7 +712,7 @@ module.exports = {
 					// Filter fields
 					.then((json) => {
 						if (ctx && params.fields) {
-							const fields = _.isString(params.fields)
+							const fields = isString(params.fields)
 								? // Compatibility with < 0.4
 								  /* istanbul ignore next */
 								  params.fields.split(/\s+/)
@@ -647,11 +720,12 @@ module.exports = {
 							// Authorize the requested fields
 							const authFields = this.authorizeFields(fields);
 
-							return json.map((item) =>
+							return json.map((item: any) =>
 								this.filterFields(item, authFields)
 							);
 						} else {
-							return json.map((item) =>
+							return json.map((item: any) =>
+								// @ts-ignore
 								this.filterFields(item, this.settings.fields)
 							);
 						}
@@ -661,11 +735,12 @@ module.exports = {
 					.then((json) => {
 						const askedExcludeFields =
 							ctx && params.excludeFields
-								? _.isString(params.excludeFields)
+								? isString(params.excludeFields)
 									? params.excludeFields.split(/\s+/)
 									: params.excludeFields
 								: [];
 						const excludeFields = askedExcludeFields.concat(
+							// @ts-ignore
 							this.settings.excludeFields || []
 						);
 
@@ -673,7 +748,7 @@ module.exports = {
 							Array.isArray(excludeFields) &&
 							excludeFields.length > 0
 						) {
-							return json.map((doc) => {
+							return json.map((doc: any) => {
 								return this._excludeFields(doc, excludeFields);
 							});
 						} else {
@@ -693,13 +768,13 @@ module.exports = {
 		 * @param {Array<String>} 	fields	Filter properties of model.
 		 * @returns	{Object}
 		 */
-		filterFields(doc, fields) {
+		filterFields(doc: object, fields: Array<string>): object {
 			// Apply field filter (support nested paths)
 			if (Array.isArray(fields)) {
 				let res = {};
 				fields.forEach((n) => {
-					const v = _.get(doc, n);
-					if (v !== undefined) _.set(res, n, v);
+					const v = get(doc, n);
+					if (v !== undefined) set(res, n, v);
 				});
 				return res;
 			}
@@ -714,7 +789,7 @@ module.exports = {
 		 * @param {Array<String>} 	fields	Exclude properties of model.
 		 * @returns	{Object}
 		 */
-		excludeFields(doc, fields) {
+		excludeFields(doc: object, fields: Array<string>): object {
 			if (Array.isArray(fields) && fields.length > 0) {
 				return this._excludeFields(doc, fields);
 			}
@@ -725,10 +800,10 @@ module.exports = {
 		/**
 		 * Exclude fields in the entity object. Internal use only, must ensure `fields` is an Array
 		 */
-		_excludeFields(doc, fields) {
-			const res = _.cloneDeep(doc);
+		_excludeFields(doc: any, fields: any[]) {
+			const res = cloneDeep(doc);
 			fields.forEach((field) => {
-				_.unset(res, field);
+				unset(res, field);
 			});
 			return res;
 		},
@@ -739,11 +814,13 @@ module.exports = {
 		 * @param {Array} askedFields
 		 * @returns {Array}
 		 */
-		authorizeFields(askedFields) {
+		authorizeFields(askedFields: Array<any>): Array<any> {
+			// @ts-ignore
 			if (this.settings.fields && this.settings.fields.length > 0) {
-				let allowedFields = [];
+				let allowedFields: Array<any> = [];
 				if (Array.isArray(askedFields) && askedFields.length > 0) {
 					askedFields.forEach((askedField) => {
+						// @ts-ignore
 						if (this.settings.fields.indexOf(askedField) !== -1) {
 							allowedFields.push(askedField);
 							return;
@@ -754,6 +831,7 @@ module.exports = {
 							while (parts.length > 1) {
 								parts.pop();
 								if (
+									// @ts-ignore
 									this.settings.fields.indexOf(
 										parts.join(".")
 									) !== -1
@@ -764,8 +842,9 @@ module.exports = {
 							}
 						}
 
+						// @ts-ignore
 						let nestedFields = this.settings.fields.filter(
-							(settingField) =>
+							(settingField: string) =>
 								settingField.startsWith(askedField + ".")
 						);
 						if (nestedFields.length > 0) {
@@ -788,17 +867,22 @@ module.exports = {
 		 * @param {Array?}			populateFields
 		 * @returns	{Promise}
 		 */
-		populateDocs(ctx, docs, populateFields) {
+		populateDocs(
+			ctx: Context,
+			docs: Array<any> | object,
+			populateFields: Array<any> | null
+		): Promise<any> {
 			if (
+				// @ts-ignore
 				!this.settings.populates ||
 				!Array.isArray(populateFields) ||
 				populateFields.length == 0
 			)
-				return Promise.resolve(docs);
+				return BlueBird.Promise.resolve(docs);
 
-			if (docs == null || (!_.isObject(docs) && !Array.isArray(docs)))
-				return Promise.resolve(docs);
-
+			if (docs == null || (!isObject(docs) && !Array.isArray(docs)))
+				return BlueBird.Promise.resolve(docs);
+			// @ts-ignore
 			const settingPopulateFields = Object.keys(this.settings.populates);
 
 			/* Group populateFields by populatesFields for deep population.
@@ -824,20 +908,21 @@ module.exports = {
 				{}
 			);
 
-			let promises = [];
+			let promises: Array<any> = [];
 			for (const populatesField of settingPopulateFields) {
+				// @ts-ignore
 				let rule = this.settings.populates[populatesField];
 				if (groupedPopulateFields[populatesField] == null) continue; // skip
 
 				// if the rule is a function, save as a custom handler
-				if (_.isFunction(rule)) {
+				if (isFunction(rule)) {
 					rule = {
-						handler: Promise.method(rule),
+						handler: BlueBird.Promise.method(rule),
 					};
 				}
 
 				// If the rule is string, convert to object
-				if (_.isString(rule)) {
+				if (isString(rule)) {
 					rule = {
 						action: rule,
 					};
@@ -848,22 +933,20 @@ module.exports = {
 				let arr = Array.isArray(docs) ? docs : [docs];
 
 				// Collect IDs from field of docs (flatten, compact & unique list)
-				let idList = _.uniq(
-					_.flattenDeep(
-						_.compact(arr.map((doc) => _.get(doc, rule.field)))
-					)
+				let idList = uniq(
+					flattenDeep(compact(arr.map((doc) => get(doc, rule.field))))
 				);
 				// Replace the received models according to IDs in the original docs
-				const resultTransform = (populatedDocs) => {
+				const resultTransform = (populatedDocs: any) => {
 					arr.forEach((doc) => {
-						let id = _.get(doc, rule.field);
-						if (_.isArray(id)) {
-							let models = _.compact(
+						let id = get(doc, rule.field);
+						if (isArray(id)) {
+							let models = compact(
 								id.map((id) => populatedDocs[id])
 							);
-							_.set(doc, populatesField, models);
+							set(doc, populatesField, models);
 						} else {
-							_.set(doc, populatesField, populatedDocs[id]);
+							set(doc, populatesField, populatedDocs[id]);
 						}
 					});
 				};
@@ -881,12 +964,12 @@ module.exports = {
 							populate: [
 								// Transform "post.author" into "author" to pass to next populating service
 								...groupedPopulateFields[populatesField]
-									.map((populateField) =>
+									.map((populateField: string | any[]) =>
 										populateField.slice(
 											populatesField.length + 1
 										)
 									) //+1 to also remove any leading "."
-									.filter((field) => field !== ""),
+									.filter((field: string) => field !== ""),
 								...(rule.populate ? rule.populate : []),
 							],
 						},
@@ -903,7 +986,7 @@ module.exports = {
 				}
 			}
 
-			return Promise.all(promises).then(() => docs);
+			return BlueBird.Promise.all(promises).then(() => docs);
 		},
 
 		/**
@@ -912,13 +995,15 @@ module.exports = {
 		 * @param {Object} entity
 		 * @returns {Promise}
 		 */
-		validateEntity(entity) {
-			if (!_.isFunction(this.settings.entityValidator))
-				return Promise.resolve(entity);
+		validateEntity(entity: object): Promise<any> {
+			// @ts-ignore
+			if (!isFunction(this.settings.entityValidator))
+				return BlueBird.Promise.resolve(entity);
 
 			let entities = Array.isArray(entity) ? entity : [entity];
-			return Promise.all(
+			return BlueBird.Promise.all(
 				entities.map((entity) =>
+					// @ts-ignore
 					this.settings.entityValidator.call(this, entity)
 				)
 			).then(() => entity);
@@ -931,7 +1016,7 @@ module.exports = {
 		 * @param {any} id
 		 * @returns {any}
 		 */
-		encodeID(id) {
+		encodeID(id: any): any {
 			return id;
 		},
 
@@ -942,7 +1027,7 @@ module.exports = {
 		 * @param {any} id
 		 * @returns {any}
 		 */
-		decodeID(id) {
+		decodeID(id: any): any {
 			return id;
 		},
 
@@ -956,10 +1041,13 @@ module.exports = {
 		 *
 		 * @returns {Array<Object>} List of found entities.
 		 */
-		_find(ctx, params) {
+		_find(ctx: Context, params: Record<string, any>): Array<object> {
+			// @ts-ignore
 			return this.adapter
 				.find(params)
-				.then((docs) => this.transformDocuments(ctx, params, docs));
+				.then((docs: any) =>
+					this.transformDocuments(ctx, params, docs)
+				);
 		},
 
 		/**
@@ -972,10 +1060,11 @@ module.exports = {
 		 *
 		 * @returns {Number} Count of found entities.
 		 */
-		_count(ctx, params) {
+		_count(ctx: Context, params: Record<string, unknown> | null): number {
 			// Remove pagination params
 			if (params && params.limit) params.limit = null;
 			if (params && params.offset) params.offset = null;
+			// @ts-ignore
 			return this.adapter.count(params);
 		},
 
@@ -989,27 +1078,32 @@ module.exports = {
 		 *
 		 * @returns {Object} List of found entities and count.
 		 */
-		_list(ctx, params) {
+		_list(ctx: Context, params: Record<string, any>): object {
 			let countParams = Object.assign({}, params);
 			// Remove pagination params
 			if (countParams && countParams.limit) countParams.limit = null;
 			if (countParams && countParams.offset) countParams.offset = null;
 			if (params.limit == null) {
 				if (
+					// @ts-ignore
 					this.settings.limit > 0 &&
+					// @ts-ignore
 					params.pageSize > this.settings.limit
 				)
+					// @ts-ignore
 					params.limit = this.settings.limit;
 				else params.limit = params.pageSize;
 			}
-			return Promise.all([
+			return BlueBird.Promise.all([
 				// Get rows
+				// @ts-ignore
 				this.adapter.find(params),
 				// Get count of all rows
+				// @ts-ignore
 				this.adapter.count(countParams),
 			]).then((res) => {
 				return this.transformDocuments(ctx, params, res[0]).then(
-					(docs) => {
+					(docs: any) => {
 						return {
 							// Rows
 							rows: docs,
@@ -1039,21 +1133,24 @@ module.exports = {
 		 *
 		 * @returns {Object} Saved entity.
 		 */
-		_create(ctx, params) {
+		_create(ctx: Context, params: object): object {
 			let entity = params;
 			return (
 				this.beforeEntityChange("create", entity, ctx)
-					.then((entity) => this.validateEntity(entity))
+					.then((entity: any) => this.validateEntity(entity))
 					// Apply idField
-					.then((entity) =>
+					.then((entity: any) =>
+						// @ts-ignore
 						this.adapter.beforeSaveTransformID(
 							entity,
+							// @ts-ignore
 							this.settings.idField
 						)
 					)
-					.then((entity) => this.adapter.insert(entity))
-					.then((doc) => this.transformDocuments(ctx, {}, doc))
-					.then((json) =>
+					// @ts-ignore
+					.then((entity: any) => this.adapter.insert(entity))
+					.then((doc: any) => this.transformDocuments(ctx, {}, doc))
+					.then((json: any) =>
 						this.entityChanged("created", json, ctx).then(
 							() => json
 						)
@@ -1071,12 +1168,15 @@ module.exports = {
 		 *
 		 * @returns {Object|Array.<Object>} Saved entity(ies).
 		 */
-		_insert(ctx, params) {
-			return Promise.resolve()
+		_insert(
+			ctx: Context,
+			params: Record<string, unknown>
+		): object | Array<object> {
+			return BlueBird.Promise.resolve()
 				.then(() => {
 					if (Array.isArray(params.entities)) {
 						return (
-							Promise.all(
+							BlueBird.Promise.all(
 								params.entities.map((entity) =>
 									this.beforeEntityChange(
 										"create",
@@ -1089,8 +1189,8 @@ module.exports = {
 									this.validateEntity(entities)
 								)
 								.then((entities) =>
-									Promise.all(
-										entities.map((entity) =>
+									BlueBird.Promise.all(
+										entities.map((entity: any) =>
 											this.beforeEntityChange(
 												"create",
 												entity,
@@ -1101,16 +1201,20 @@ module.exports = {
 								)
 								// Apply idField
 								.then((entities) => {
+									// @ts-ignore
 									if (this.settings.idField === "_id")
 										return entities;
 									return entities.map((entity) =>
+										// @ts-ignore
 										this.adapter.beforeSaveTransformID(
 											entity,
+											// @ts-ignore
 											this.settings.idField
 										)
 									);
 								})
 								.then((entities) =>
+									// @ts-ignore
 									this.adapter.insertMany(entities)
 								)
 						);
@@ -1121,19 +1225,26 @@ module.exports = {
 								params.entity,
 								ctx
 							)
-								.then((entity) => this.validateEntity(entity))
+								.then((entity: any) =>
+									this.validateEntity(entity)
+								)
 								// Apply idField
-								.then((entity) =>
+								.then((entity: any) =>
+									// @ts-ignore
 									this.adapter.beforeSaveTransformID(
 										entity,
+										// @ts-ignore
 										this.settings.idField
 									)
 								)
-								.then((entity) => this.adapter.insert(entity))
+								.then((entity: any) =>
+									// @ts-ignore
+									this.adapter.insert(entity)
+								)
 						);
 					}
-					return Promise.reject(
-						new MoleculerClientError(
+					return BlueBird.Promise.reject(
+						new Errors.MoleculerClientError(
 							"Invalid request! The 'params' must contain 'entity' or 'entities'!",
 							400
 						)
@@ -1157,19 +1268,24 @@ module.exports = {
 		 *
 		 * @throws {EntityNotFoundError} - 404 Entity not found
 		 */
-		_get(ctx, params) {
+		_get(
+			ctx: Context,
+			params: Record<string, unknown>
+		): object | Array<object> {
 			let id = params.id;
-			let origDoc;
+			let origDoc: any;
 			let shouldMapping = params.mapping === true;
 			return this.getById(id, true)
 				.then((doc) => {
 					if (!doc)
-						return Promise.reject(new EntityNotFoundError(id));
+						return BlueBird.Promise.reject(
+							new EntityNotFoundError(id)
+						);
 
 					if (shouldMapping)
-						origDoc = _.isArray(doc)
-							? doc.map((d) => _.cloneDeep(d))
-							: _.cloneDeep(doc);
+						origDoc = isArray(doc)
+							? doc.map((d) => cloneDeep(d))
+							: cloneDeep(doc);
 					else origDoc = doc;
 
 					return this.transformDocuments(ctx, params, doc);
@@ -1177,22 +1293,28 @@ module.exports = {
 				.then((json) => {
 					if (params.mapping !== true) return json;
 
-					let res = {};
-					if (_.isArray(json)) {
+					let res: { [x: string]: any } = {};
+					if (isArray(json)) {
 						json.forEach((doc, i) => {
 							const id = this.encodeID(
+								// @ts-ignore
 								this.adapter.afterRetrieveTransformID(
 									origDoc[i],
+									// @ts-ignore
 									this.settings.idField
+									// @ts-ignore
 								)[this.settings.idField]
 							);
 							res[id] = doc;
 						});
-					} else if (_.isObject(json)) {
+					} else if (isObject(json)) {
 						const id = this.encodeID(
+							// @ts-ignore
 							this.adapter.afterRetrieveTransformID(
 								origDoc,
+								// @ts-ignore
 								this.settings.idField
+								// @ts-ignore
 							)[this.settings.idField]
 						);
 						res[id] = json;
@@ -1214,35 +1336,42 @@ module.exports = {
 		 *
 		 * @throws {EntityNotFoundError} - 404 Entity not found
 		 */
-		_update(ctx, params) {
-			let id;
+		_update(ctx: Context, params: object): object {
+			let id: any;
 
-			return Promise.resolve()
-				.then(() => this.beforeEntityChange("update", params, ctx))
-				.then((params) => {
-					let sets = {};
-					// Convert fields from params to "$set" update object
-					Object.keys(params).forEach((prop) => {
-						if (prop == "id" || prop == this.settings.idField)
-							id = this.decodeID(params[prop]);
-						else sets[prop] = params[prop];
-					});
+			return (
+				BlueBird.Promise.resolve()
+					.then(() => this.beforeEntityChange("update", params, ctx))
+					.then((params) => {
+						let sets: { [x: string]: any } = {};
+						// Convert fields from params to "$set" update object
+						Object.keys(params).forEach((prop) => {
+							// @ts-ignore
+							if (prop == "id" || prop == this.settings.idField)
+								id = this.decodeID(params[prop]);
+							else sets[prop] = params[prop];
+						});
+						// @ts-ignore
+						if (this.settings.useDotNotation)
+							sets = flatten(sets, { safe: true });
 
-					if (this.settings.useDotNotation)
-						sets = flatten(sets, { safe: true });
-
-					return sets;
-				})
-				.then((sets) => this.adapter.updateById(id, { $set: sets }))
-				.then((doc) => {
-					if (!doc)
-						return Promise.reject(new EntityNotFoundError(id));
-					return this.transformDocuments(ctx, {}, doc).then((json) =>
-						this.entityChanged("updated", json, ctx).then(
-							() => json
-						)
-					);
-				});
+						return sets;
+					})
+					// @ts-ignore
+					.then((sets) => this.adapter.updateById(id, { $set: sets }))
+					.then((doc) => {
+						if (!doc)
+							return BlueBird.Promise.reject(
+								new EntityNotFoundError(id)
+							);
+						return this.transformDocuments(ctx, {}, doc).then(
+							(json) =>
+								this.entityChanged("updated", json, ctx).then(
+									() => json
+								)
+						);
+					})
+			);
 		},
 
 		/**
@@ -1255,22 +1384,26 @@ module.exports = {
 		 *
 		 * @throws {EntityNotFoundError} - 404 Entity not found
 		 */
-		_remove(ctx, params) {
+		_remove(ctx: Context, params: Record<string, unknown>): any {
 			const id = this.decodeID(params.id);
-			return Promise.resolve()
-				.then(() => this.beforeEntityChange("remove", params, ctx))
-				.then(() => this.adapter.removeById(id))
-				.then((doc) => {
-					if (!doc)
-						return Promise.reject(
-							new EntityNotFoundError(params.id)
+			return (
+				BlueBird.Promise.resolve()
+					.then(() => this.beforeEntityChange("remove", params, ctx))
+					// @ts-ignore
+					.then(() => this.adapter.removeById(id))
+					.then((doc) => {
+						if (!doc)
+							return BlueBird.Promise.reject(
+								new EntityNotFoundError(params.id)
+							);
+						return this.transformDocuments(ctx, {}, doc).then(
+							(json) =>
+								this.entityChanged("removed", json, ctx).then(
+									() => json
+								)
 						);
-					return this.transformDocuments(ctx, {}, doc).then((json) =>
-						this.entityChanged("removed", json, ctx).then(
-							() => json
-						)
-					);
-				});
+					})
+			);
 		},
 	},
 
@@ -1279,11 +1412,11 @@ module.exports = {
 	 */
 	created() {
 		// Compatibility with < 0.4
-		if (_.isString(this.settings.fields)) {
+		if (isString(this.settings.fields)) {
 			this.settings.fields = this.settings.fields.split(/\s+/);
 		}
 
-		if (_.isString(this.settings.excludeFields)) {
+		if (isString(this.settings.excludeFields)) {
 			this.settings.excludeFields =
 				this.settings.excludeFields.split(/\s+/);
 		}
@@ -1315,22 +1448,22 @@ module.exports = {
 		// Transform entity validation schema to checker function
 		if (
 			this.broker.validator &&
-			_.isObject(this.settings.entityValidator) &&
-			!_.isFunction(this.settings.entityValidator)
+			isObject(this.settings.entityValidator) &&
+			!isFunction(this.settings.entityValidator)
 		) {
 			const check = this.broker.validator.compile(
 				this.settings.entityValidator
 			);
-			this.settings.entityValidator = async (entity) => {
+			this.settings.entityValidator = async (entity: any) => {
 				let res = check(entity);
 				if (check.async === true || res.then instanceof Function)
 					res = await res;
-				if (res === true) return Promise.resolve();
+				if (res === true) return BlueBird.Promise.resolve();
 				else
-					return Promise.reject(
-						new ValidationError(
+					return BlueBird.Promise.reject(
+						new Errors.ValidationError(
 							"Entity validation error!",
-							null,
+							"",
 							res
 						)
 					);
@@ -1348,7 +1481,7 @@ module.exports = {
 					let connecting = () => {
 						this.connect()
 							.then(resolve)
-							.catch((err) => {
+							.catch((err: any) => {
 								this.logger.error("Connection error!", err);
 								setTimeout(() => {
 									this.logger.warn("Reconnecting...");
@@ -1361,7 +1494,7 @@ module.exports = {
 				});
 			}
 			/* istanbul ignore next */
-			return Promise.reject(
+			return BlueBird.Promise.reject(
 				new Error("Please set the store adapter in schema on!")
 			);
 		}

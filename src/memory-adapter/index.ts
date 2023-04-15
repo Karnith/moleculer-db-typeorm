@@ -6,24 +6,26 @@
 
 "use strict";
 
-const _ = require("lodash");
-const Promise = require("bluebird");
-// const Datastore = require("nedb");
-const Datastore = require("@seald-io/nedb");
+import { cloneDeep, isNumber, isString, pick, values } from "lodash";
+import Promise from "bluebird";
+import Datastore from "@seald-io/nedb";
+import { Service, ServiceBroker } from "moleculer";
 
 /**
  * NeDB adapter for `moleculer-db`
  *
  * @class MemoryDbAdapter
  */
-class MemoryDbAdapter {
+export default class MemoryDbAdapter {
+	// Dynamic property key
+	[index: string]: any;
 	/**
 	 * Creates an instance of MemoryDbAdapter.
 	 *
 	 * @param {Object} opts
 	 * @memberof MemoryDbAdapter
 	 */
-	constructor(opts) {
+	constructor(opts?: object) {
 		this.opts = opts;
 	}
 
@@ -34,7 +36,7 @@ class MemoryDbAdapter {
 	 * @param {Service} service
 	 * @memberof MemoryDbAdapter
 	 */
-	init(broker, service) {
+	init(broker: ServiceBroker, service: Service) {
 		this.broker = broker;
 		this.service = service;
 	}
@@ -45,7 +47,7 @@ class MemoryDbAdapter {
 	 * @returns {Promise}
 	 * @memberof MemoryDbAdapter
 	 */
-	connect() {
+	connect(): Promise<any> {
 		// this.db = new Datastore(this.opts); // in-memory
 		// if (this.opts instanceof Datastore) {}
 		// 	this.db = this.opts; //use preconfigured datastore
@@ -81,7 +83,7 @@ class MemoryDbAdapter {
 	 * @returns {Promise}
 	 * @memberof MemoryDbAdapter
 	 */
-	disconnect() {
+	disconnect(): Promise<any> {
 		this.db = null;
 		return Promise.resolve();
 	}
@@ -101,9 +103,9 @@ class MemoryDbAdapter {
 	 * @returns {Promise}
 	 * @memberof MemoryDbAdapter
 	 */
-	find(filters) {
+	find(filters?: object): Promise<any> {
 		return new Promise((resolve, reject) => {
-			this.createCursor(filters).exec((err, docs) => {
+			this.createCursor(filters!).exec((err: any, docs: any) => {
 				/* istanbul ignore next */
 				if (err) return reject(err);
 
@@ -119,7 +121,7 @@ class MemoryDbAdapter {
 	 * @returns {Promise}
 	 * @memberof MemoryDbAdapter
 	 */
-	findOne(query) {
+	findOne(query: object): Promise<any> {
 		return this.db.findOne(query);
 	}
 
@@ -130,7 +132,7 @@ class MemoryDbAdapter {
 	 * @returns {Promise}
 	 * @memberof MemoryDbAdapter
 	 */
-	findById(_id) {
+	findById(_id: any): Promise<any> {
 		return this.db.findOne({ _id });
 	}
 
@@ -141,9 +143,9 @@ class MemoryDbAdapter {
 	 * @returns {Promise}
 	 * @memberof MemoryDbAdapter
 	 */
-	findByIds(ids) {
+	findByIds(ids: Array<number>): Promise<any> {
 		return new Promise((resolve, reject) => {
-			this.db.find({ _id: { $in: ids } }).exec((err, docs) => {
+			this.db.find({ _id: { $in: ids } }).exec((err: any, docs: any) => {
 				/* istanbul ignore next */
 				if (err) return reject(err);
 
@@ -164,14 +166,16 @@ class MemoryDbAdapter {
 	 * @returns {Promise}
 	 * @memberof MemoryDbAdapter
 	 */
-	count(filters = {}) {
+	count(filters: object = {}): Promise<any> {
 		return new Promise((resolve, reject) => {
-			this.createCursor(filters).exec((err, docs) => {
-				/* istanbul ignore next */
-				if (err) return reject(err);
+			this.createCursor(filters).exec(
+				(err: any, docs: string | any[]) => {
+					/* istanbul ignore next */
+					if (err) return reject(err);
 
-				resolve(docs.length);
-			});
+					resolve(docs.length);
+				}
+			);
 		});
 	}
 
@@ -182,7 +186,7 @@ class MemoryDbAdapter {
 	 * @returns {Promise}
 	 * @memberof MemoryDbAdapter
 	 */
-	insert(entity) {
+	insert(entity: object): Promise<any> {
 		return this.db.insert(entity);
 	}
 
@@ -193,7 +197,7 @@ class MemoryDbAdapter {
 	 * @returns {Promise}
 	 * @memberof MemoryDbAdapter
 	 */
-	insertMany(entities) {
+	insertMany(entities: Array<object>): Promise<any> {
 		return this.db.insert(entities);
 	}
 
@@ -205,10 +209,10 @@ class MemoryDbAdapter {
 	 * @returns {Promise}
 	 * @memberof MemoryDbAdapter
 	 */
-	updateMany(query, update) {
+	updateMany(query: object, update: object): Promise<any> {
 		return this.db
 			.update(query, update, { multi: true })
-			.then((res) => res[0]);
+			.then((res: any[]) => res[0]);
 	}
 
 	/**
@@ -219,10 +223,10 @@ class MemoryDbAdapter {
 	 * @returns {Promise}
 	 * @memberof MemoryDbAdapter
 	 */
-	updateById(_id, update) {
+	updateById(_id: any, update: object): Promise<any> {
 		return this.db
 			.update({ _id }, update, { returnUpdatedDocs: true })
-			.then((res) => res[1]);
+			.then((res: any[]) => res[1]);
 	}
 
 	/**
@@ -232,7 +236,7 @@ class MemoryDbAdapter {
 	 * @returns {Promise}
 	 * @memberof MemoryDbAdapter
 	 */
-	removeMany(query) {
+	removeMany(query: object): Promise<any> {
 		return this.db.remove(query, { multi: true });
 	}
 
@@ -243,7 +247,7 @@ class MemoryDbAdapter {
 	 * @returns {Promise}
 	 * @memberof MemoryDbAdapter
 	 */
-	removeById(_id) {
+	removeById(_id: any): Promise<any> {
 		return this.db.remove({ _id });
 	}
 
@@ -253,7 +257,7 @@ class MemoryDbAdapter {
 	 * @returns {Promise}
 	 * @memberof MemoryDbAdapter
 	 */
-	clear() {
+	clear(): Promise<any> {
 		return this.db.remove({}, { multi: true });
 	}
 
@@ -264,7 +268,7 @@ class MemoryDbAdapter {
 	 * @returns {Object}
 	 * @memberof MemoryDbAdapter
 	 */
-	entityToObject(entity) {
+	entityToObject(entity: any): object {
 		return entity;
 	}
 
@@ -283,15 +287,19 @@ class MemoryDbAdapter {
 	 * @returns {Query}
 	 * @memberof MemoryDbAdapter
 	 */
-	createCursor(params) {
+	createCursor(params: Record<string, any>) {
 		if (params) {
-			let q;
+			let q: {
+				sort: (arg0: {}) => void;
+				limit: (arg0: number) => void;
+				skip: (arg0: number) => void;
+			};
 
 			// Text search
-			if (_.isString(params.search) && params.search !== "") {
-				let fields = [];
+			if (isString(params.search) && params.search !== "") {
+				let fields: any = [];
 				if (params.searchFields) {
-					fields = _.isString(params.searchFields)
+					fields = isString(params.searchFields)
 						? params.searchFields.split(" ")
 						: params.searchFields;
 				}
@@ -299,9 +307,9 @@ class MemoryDbAdapter {
 				q = this.db.find({
 					$where: function () {
 						let item = this;
-						if (fields.length > 0) item = _.pick(this, fields);
+						if (fields.length > 0) item = pick(this, fields);
 
-						const res = _.values(item).find(
+						const res = values(item).find(
 							(v) =>
 								String(v)
 									.toLowerCase()
@@ -318,8 +326,8 @@ class MemoryDbAdapter {
 
 			// Sort
 			if (params.sort) {
-				const sortFields = {};
-				params.sort.forEach((field) => {
+				const sortFields: { [key: string]: number } = {};
+				params.sort.forEach((field: string) => {
 					if (field.startsWith("-")) sortFields[field.slice(1)] = -1;
 					else sortFields[field] = 1;
 				});
@@ -327,11 +335,11 @@ class MemoryDbAdapter {
 			}
 
 			// Limit
-			if (_.isNumber(params.limit) && params.limit > 0)
+			if (isNumber(params.limit) && params.limit > 0)
 				q.limit(params.limit);
 
 			// Offset
-			if (_.isNumber(params.offset) && params.offset > 0)
+			if (isNumber(params.offset) && params.offset > 0)
 				q.skip(params.offset);
 
 			return q;
@@ -347,8 +355,11 @@ class MemoryDbAdapter {
 	 * @memberof MemoryDbAdapter
 	 * @returns {Object} Modified entity
 	 */
-	beforeSaveTransformID(entity, idField) {
-		let newEntity = _.cloneDeep(entity);
+	beforeSaveTransformID(
+		entity: Record<string, any>,
+		idField: string
+	): object {
+		let newEntity = cloneDeep(entity);
 
 		if (idField !== "_id" && entity[idField] !== undefined) {
 			newEntity._id = newEntity[idField];
@@ -365,7 +376,10 @@ class MemoryDbAdapter {
 	 * @memberof MemoryDbAdapter
 	 * @returns {Object} Modified entity
 	 */
-	afterRetrieveTransformID(entity, idField) {
+	afterRetrieveTransformID(
+		entity: Record<string, any>,
+		idField: string
+	): object {
 		if (idField !== "_id") {
 			entity[idField] = entity["_id"];
 			delete entity._id;

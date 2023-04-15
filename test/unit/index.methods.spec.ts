@@ -1,9 +1,9 @@
 "use strict";
 
-const { ServiceBroker, Service, Context } = require("moleculer");
-const DbService = require("../../src");
+import { ServiceBroker, Service, Context } from "moleculer";
+import * as DbService from "../../src";
 
-function protectReject(err) {
+function protectReject(err: any) {
 	if (err && err.stack) {
 		console.error(err);
 		console.error(err.stack);
@@ -38,6 +38,7 @@ describe("Test DbService methods", () => {
 
 	const broker = new ServiceBroker({
 		logger: false,
+		// @ts-ignore
 		validation: false,
 		cacher: true,
 	});
@@ -56,14 +57,17 @@ describe("Test DbService methods", () => {
 	);
 
 	it("should call 'afterConnected' of schema", () => {
-		return broker
-			.start()
-			.delay(100)
-			.then(() => {
-				expect(afterConnected).toHaveBeenCalledTimes(1);
-				expect(adapter.connect).toHaveBeenCalledTimes(1);
-			})
-			.catch(protectReject);
+		return (
+			broker
+				.start()
+				// @ts-ignore
+				.delay(100)
+				.then(() => {
+					expect(afterConnected).toHaveBeenCalledTimes(1);
+					expect(adapter.connect).toHaveBeenCalledTimes(1);
+				})
+				.catch(protectReject)
+		);
 	});
 
 	describe("Test `_find` method", () => {
@@ -77,7 +81,7 @@ describe("Test DbService methods", () => {
 			return service
 				._find(ctx, p)
 				.catch(protectReject)
-				.then((res) => {
+				.then((res: any) => {
 					expect(res).toBe(docs);
 
 					expect(adapter.find).toHaveBeenCalledTimes(1);
@@ -104,7 +108,7 @@ describe("Test DbService methods", () => {
 			return service
 				._count(ctx, p)
 				.catch(protectReject)
-				.then((res) => {
+				.then((res: any) => {
 					expect(res).toBe(3);
 
 					expect(adapter.count).toHaveBeenCalledTimes(1);
@@ -131,7 +135,7 @@ describe("Test DbService methods", () => {
 			return service
 				._list(ctx, p)
 				.catch(protectReject)
-				.then((res) => {
+				.then((res: any) => {
 					expect(res).toEqual({
 						page: 2,
 						pageSize: 10,
@@ -180,7 +184,7 @@ describe("Test DbService methods", () => {
 			return service
 				._create(Context, p)
 				.catch(protectReject)
-				.then((res) => {
+				.then((res: any) => {
 					expect(res).toEqual(doc);
 
 					expect(adapter.insert).toHaveBeenCalledTimes(1);
@@ -233,7 +237,7 @@ describe("Test DbService methods", () => {
 			return service
 				._insert(Context, p)
 				.catch(protectReject)
-				.then((res) => {
+				.then((res: any) => {
 					expect(res).toEqual(doc);
 
 					expect(adapter.insert).toHaveBeenCalledTimes(1);
@@ -282,7 +286,7 @@ describe("Test DbService methods", () => {
 			return service
 				._insert(Context, p)
 				.catch(protectReject)
-				.then((res) => {
+				.then((res: any) => {
 					expect(res).toEqual(docs);
 
 					expect(adapter.insertMany).toHaveBeenCalledTimes(1);
@@ -328,7 +332,7 @@ describe("Test DbService methods", () => {
 			return service
 				._update(Context, p)
 				.catch(protectReject)
-				.then((res) => {
+				.then((res: any) => {
 					expect(res).toEqual(doc);
 
 					expect(service.decodeID).toHaveBeenCalledTimes(1);
@@ -381,7 +385,7 @@ describe("Test DbService methods", () => {
 			return service
 				._update(Context, p)
 				.catch(protectReject)
-				.then((res) => {
+				.then((res: any) => {
 					expect(res).toEqual(doc);
 
 					expect(adapter.updateById).toHaveBeenCalledTimes(1);
@@ -408,7 +412,7 @@ describe("Test DbService methods", () => {
 			return service
 				._remove(Context, p)
 				.catch(protectReject)
-				.then((res) => {
+				.then((res: any) => {
 					expect(res).toEqual(3);
 
 					expect(service.decodeID).toHaveBeenCalledTimes(1);

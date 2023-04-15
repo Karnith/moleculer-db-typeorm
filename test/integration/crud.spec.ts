@@ -1,28 +1,35 @@
 "use strict";
 
-const { ServiceBroker } = require("moleculer");
-const DbService = require("../../src");
-const { EntityNotFoundError } = require("../../src/errors");
-const Adapter = require("../../src/memory-adapter");
+import { ServiceBroker } from "moleculer";
+import * as DbService from "../../src";
+import EntityNotFoundError from "../../src/errors";
+import { default as Adapter } from "../../src/memory-adapter";
 
-function protectReject(err) {
+function protectReject(err: any) {
 	if (err && err.stack) console.error(err.stack);
 	expect(err).toBe(true);
 }
 
-function equalAtLeast(test, orig) {
+function equalAtLeast(
+	test: { [x: string]: any },
+	orig: { [x: string]: any; title?: string; content?: string; votes?: number }
+) {
 	Object.keys(orig).forEach((key) => {
 		expect(test[key]).toEqual(orig[key]);
 	});
 }
 
-function equalID(test, orig) {
+function equalID(
+	test: { _id: any },
+	orig: { title?: string; content?: string; votes?: number; _id?: any }
+) {
 	expect(test._id).toEqual(orig._id);
 }
 
 describe("Test CRUD methods", () => {
 	// Create broker
 	let broker = new ServiceBroker({
+		// @ts-ignore
 		logger: console,
 		logLevel: "error",
 	});
@@ -38,6 +45,7 @@ describe("Test CRUD methods", () => {
 	);
 
 	beforeAll(() => {
+		// @ts-ignore
 		return broker.start().delay(1000);
 	});
 
@@ -45,7 +53,7 @@ describe("Test CRUD methods", () => {
 		return broker.stop();
 	});
 
-	const posts = [
+	const posts: any = [
 		{ title: "My first post", content: "This is the content", votes: 2 },
 		{ title: "Second post", content: "Waiting for the next...", votes: 5 },
 		{
@@ -59,7 +67,7 @@ describe("Test CRUD methods", () => {
 		return broker
 			.call("posts.create", posts[0])
 			.catch(protectReject)
-			.then((res) => {
+			.then((res: any) => {
 				expect(res).toBeDefined();
 				expect(res._id).toBeDefined();
 				posts[0]._id = res._id;
@@ -72,7 +80,7 @@ describe("Test CRUD methods", () => {
 		return broker
 			.call("posts.insert", { entities: [posts[1], posts[2]] })
 			.catch(protectReject)
-			.then((res) => {
+			.then((res: any) => {
 				expect(res.length).toBe(2);
 
 				posts[1]._id = res[0]._id;
@@ -111,7 +119,7 @@ describe("Test CRUD methods", () => {
 		return broker
 			.call("posts.get", { id: posts[1]._id })
 			.catch(protectReject)
-			.then((res) => {
+			.then((res: any) => {
 				equalAtLeast(res, posts[1]);
 			});
 	});
@@ -133,7 +141,7 @@ describe("Test CRUD methods", () => {
 		return broker
 			.call("posts.get", { id: [posts[2]._id, posts[0]._id] })
 			.catch(protectReject)
-			.then((res) => {
+			.then((res: any) => {
 				expect(res.length).toBe(2);
 				expect(
 					res[0]._id == posts[0]._id || res[0]._id == posts[2]._id
@@ -148,7 +156,7 @@ describe("Test CRUD methods", () => {
 		return broker
 			.call("posts.find", { search: "first" })
 			.catch(protectReject)
-			.then((res) => {
+			.then((res: any) => {
 				expect(res.length).toBe(1);
 				equalID(res[0], posts[0]);
 			});
@@ -163,7 +171,7 @@ describe("Test CRUD methods", () => {
 				votes: 8,
 			})
 			.catch(protectReject)
-			.then((res) => {
+			.then((res: any) => {
 				expect(res._id).toEqual(posts[1]._id);
 				expect(res.title).toEqual("Other title");
 				expect(res.content).toEqual("Modify my content");
@@ -176,7 +184,7 @@ describe("Test CRUD methods", () => {
 		return broker
 			.call("posts.find", { sort: "-votes" })
 			.catch(protectReject)
-			.then((res) => {
+			.then((res: any) => {
 				expect(res.length).toBe(3);
 
 				equalID(res[0], posts[1]);
@@ -189,7 +197,7 @@ describe("Test CRUD methods", () => {
 		return broker
 			.call("posts.find", { sort: "votes", limit: "2", offset: 1 })
 			.catch(protectReject)
-			.then((res) => {
+			.then((res: any) => {
 				expect(res.length).toBe(2);
 				equalID(res[0], posts[0]);
 				equalID(res[1], posts[1]);
@@ -200,7 +208,7 @@ describe("Test CRUD methods", () => {
 		return broker
 			.call("posts.find", { sort: "votes", limit: 999 })
 			.catch(protectReject)
-			.then((res) => {
+			.then((res: any) => {
 				expect(res.length).toBe(3);
 			});
 	});
@@ -209,7 +217,7 @@ describe("Test CRUD methods", () => {
 		return broker
 			.call("posts.find", { search: "post", sort: "-votes" })
 			.catch(protectReject)
-			.then((res) => {
+			.then((res: any) => {
 				expect(res.length).toBe(2);
 				equalID(res[0], posts[0]);
 				equalID(res[1], posts[2]);
@@ -224,7 +232,7 @@ describe("Test CRUD methods", () => {
 				sort: "-votes",
 			})
 			.catch(protectReject)
-			.then((res) => {
+			.then((res: any) => {
 				expect(res.length).toBe(2);
 				equalID(res[0], posts[0]);
 				equalID(res[1], posts[2]);
@@ -235,7 +243,7 @@ describe("Test CRUD methods", () => {
 		return broker
 			.call("posts.list", { sort: "-votes" })
 			.catch(protectReject)
-			.then((res) => {
+			.then((res: any) => {
 				expect(res.page).toBe(1);
 				expect(res.pageSize).toBe(10);
 				expect(res.total).toBe(3);
@@ -256,7 +264,7 @@ describe("Test CRUD methods", () => {
 				searchFields: ["title"],
 			})
 			.catch(protectReject)
-			.then((res) => {
+			.then((res: any) => {
 				expect(res.page).toBe(2);
 				expect(res.pageSize).toBe(10);
 				expect(res.total).toBe(2);
@@ -270,7 +278,7 @@ describe("Test CRUD methods", () => {
 		return broker
 			.call("posts.list", { page: "1", pageSize: "2" })
 			.catch(protectReject)
-			.then((res) => {
+			.then((res: any) => {
 				expect(res.page).toBe(1);
 				expect(res.pageSize).toBe(2);
 				expect(res.total).toBe(3);

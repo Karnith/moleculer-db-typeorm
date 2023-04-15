@@ -1,11 +1,11 @@
 "use strict";
 
-const { ServiceBroker } = require("moleculer");
-const Adapter = require("../../src/memory-adapter");
+import { ServiceBroker } from "moleculer";
+import { default as Adapter } from "../../src/memory-adapter";
 
-const Datastore = require("@seald-io/nedb");
+import { default as Datastore } from "@seald-io/nedb";
 
-function protectReject(err) {
+function protectReject(err: { stack: any }) {
 	if (err && err.stack) {
 		console.error(err);
 		console.error(err.stack);
@@ -56,7 +56,7 @@ describe("Test Adapter methods", () => {
 		email: "heisenberg@gmail.com",
 	};
 
-	let savedDoc;
+	let savedDoc: { _id: any };
 
 	it("should insert a document", () => {
 		return adapter
@@ -70,7 +70,7 @@ describe("Test Adapter methods", () => {
 			.catch(protectReject);
 	});
 
-	let multipleDocs;
+	let multipleDocs: { _id: any }[];
 	it("should insert multiple document", () => {
 		return adapter
 			.insertMany([
