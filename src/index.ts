@@ -41,7 +41,7 @@ module.exports = {
 	// Service's metadata
 	metadata: {
 		$category: "database",
-		$description: "Official Data Access service",
+		$description: "Unofficial Data Access service",
 		$official: true,
 		$package: {
 			name: pkg.name,

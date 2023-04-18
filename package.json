@@ -5,14 +5,17 @@
   "main": "./dist/index.js",
   "types": "./moleculer-db-typeorm.d.ts",
   "scripts": {
-    "build": "tsc --build tsconfig.json",
     "dev": "nodemon examples/index.js",
     "ci": "jest --watch",
+    "clean": "yarn clean:packages && yarn install",
+    "clean:packages": "rm -fr yarn.lock package-lock.json dist node_modules",
     "test": "jest --coverage",
     "lint": "eslint --ext=.js src test",
     "deps": "npm-check -u",
     "readme": "node node_modules/moleculer-docgen/index.js -t README.md src/index.js",
-    "coverall": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
+    "coverall": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
+    "build": "yarn build:clean && tsc --build tsconfig.json",
+    "build:clean": "rimraf dist bin"
   },
   "keywords": [
     "microservice",
@@ -45,6 +48,7 @@
     "moleculer-docgen": "^0.3.0",
     "nodemon": "^2.0.22",
     "npm-check": "^6.0.1",
+    "rimraf": "^5.0.0",
     "ts-jest": "^29.1.0",
     "typescript": "^5.0.4"
   },
@@ -84,6 +88,7 @@
     "@seald-io/nedb": "^4.0.1",
     "bluebird": "^3.7.2",
     "flat": "^5.0.2",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "typeorm": "^0.3.15"
   }
 }
