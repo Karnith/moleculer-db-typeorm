@@ -21,11 +21,13 @@ import {
 	uniq,
 	unset,
 } from "lodash";
-import * as BlueBird from "bluebird";
+import { all, method, reject, resolve } from "bluebird";
+import "reflect-metadata";
 import { flatten } from "flat";
 import { Context, Errors } from "moleculer";
 import EntityNotFoundError from "./errors";
 import MemoryAdapter from "./memory-adapter";
+import TypeORMDbAdapter from "./typeorm-adapter";
 import pkg from "../package.json";
 
 /**
@@ -54,6 +56,8 @@ module.exports = {
 	adapter: null,
 
 	mode: "",
+
+	model: "",
 
 	/**
 	 * Default settings
@@ -445,36 +449,50 @@ module.exports = {
 		connect(mode = this.schema.mode, options: any, cb: any): Promise<any> {
 			if (!isEmpty(mode)) {
 				//@ts-ignore
-				return this.adapter.connect(mode, options, cb).then(() => {
-					// Call an 'afterConnected' handler in schema
-					//@ts-ignore
-					if (isFunction(this.schema.afterConnected)) {
-						try {
-							//@ts-ignore
-							return this.schema.afterConnected.call(this);
-						} catch (err) {
-							/* istanbul ignore next */
-							// @ts-ignore
-							this.logger.error("afterConnected error!", err);
+				return this.adapter
+					.connect(mode, options, cb)
+					.then(() => {
+						// Call an 'afterConnected' handler in schema
+						//@ts-ignore
+						if (isFunction(this.schema.afterConnected)) {
+							try {
+								//@ts-ignore
+								return this.schema.afterConnected.call(this);
+							} catch (err) {
+								/* istanbul ignore next */
+								// @ts-ignore
+								this.logger.error("afterConnected error!", err);
+							}
 						}
-					}
-				});
+					})
+					.catch((err: any) => {
+						/* istanbul ignore next */
+						// @ts-ignore
+						this.logger.error("TypeORM connect error!", err);
+					});
 			} else {
 				//@ts-ignore
-				return this.adapter.connect().then(() => {
-					// Call an 'afterConnected' handler in schema
-					//@ts-ignore
-					if (isFunction(this.schema.afterConnected)) {
-						try {
-							//@ts-ignore
-							return this.schema.afterConnected.call(this);
-						} catch (err) {
-							/* istanbul ignore next */
-							// @ts-ignore
-							this.logger.error("afterConnected error!", err);
+				return this.adapter
+					.connect()
+					.then(() => {
+						// Call an 'afterConnected' handler in schema
+						//@ts-ignore
+						if (isFunction(this.schema.afterConnected)) {
+							try {
+								//@ts-ignore
+								return this.schema.afterConnected.call(this);
+							} catch (err) {
+								/* istanbul ignore next */
+								// @ts-ignore
+								this.logger.error("afterConnected error!", err);
+							}
 						}
-					}
-				});
+					})
+					.catch((err: any) => {
+						/* istanbul ignore next */
+						// @ts-ignore
+						this.logger.error("TypeORM connect error!", err);
+					});
 			}
 		},
 
@@ -565,7 +583,7 @@ module.exports = {
 			id: any | Array<any>,
 			decoding: boolean | null
 		): Promise<object | object[]> {
-			return await BlueBird.Promise.resolve().then(() => {
+			return await resolve().then(() => {
 				if (isArray(id)) {
 					// @ts-ignore
 					return this.adapter.findByIds(
@@ -597,9 +615,9 @@ module.exports = {
 			const eventName = `beforeEntity${capitalize(type)}`;
 			// @ts-ignore
 			if (this.schema[eventName] == null) {
-				return BlueBird.Promise.resolve(entity);
+				return resolve(entity);
 			}
-			return BlueBird.Promise.resolve(
+			return resolve(
 				// @ts-ignore
 				this.schema[eventName].call(this, entity, ctx)
 			);
@@ -645,7 +663,7 @@ module.exports = {
 			if (this.broker.cacher)
 				// @ts-ignore
 				return this.broker.cacher.clean(`${this.fullName}.**`);
-			return BlueBird.Promise.resolve();
+			return resolve();
 		},
 
 		/**
@@ -666,12 +684,11 @@ module.exports = {
 				if (isObject(docs)) {
 					isDoc = true;
 					docs = [docs];
-				} else return BlueBird.Promise.resolve(docs);
+				} else return resolve(docs);
 			}
 
 			return (
-				BlueBird.Promise.resolve(docs)
-
+				resolve(docs)
 					// Convert entity to JS object
 					.then((docs) =>
 						// @ts-ignore
@@ -878,10 +895,10 @@ module.exports = {
 				!Array.isArray(populateFields) ||
 				populateFields.length == 0
 			)
-				return BlueBird.Promise.resolve(docs);
+				return resolve(docs);
 
 			if (docs == null || (!isObject(docs) && !Array.isArray(docs)))
-				return BlueBird.Promise.resolve(docs);
+				return resolve(docs);
 			// @ts-ignore
 			const settingPopulateFields = Object.keys(this.settings.populates);
 
@@ -917,7 +934,7 @@ module.exports = {
 				// if the rule is a function, save as a custom handler
 				if (isFunction(rule)) {
 					rule = {
-						handler: BlueBird.Promise.method(rule),
+						handler: method(rule),
 					};
 				}
 
@@ -986,7 +1003,7 @@ module.exports = {
 				}
 			}
 
-			return BlueBird.Promise.all(promises).then(() => docs);
+			return all(promises).then(() => docs);
 		},
 
 		/**
@@ -998,10 +1015,10 @@ module.exports = {
 		validateEntity(entity: object): Promise<any> {
 			// @ts-ignore
 			if (!isFunction(this.settings.entityValidator))
-				return BlueBird.Promise.resolve(entity);
+				return resolve(entity);
 
 			let entities = Array.isArray(entity) ? entity : [entity];
-			return BlueBird.Promise.all(
+			return all(
 				entities.map((entity) =>
 					// @ts-ignore
 					this.settings.entityValidator.call(this, entity)
@@ -1094,7 +1111,7 @@ module.exports = {
 					params.limit = this.settings.limit;
 				else params.limit = params.pageSize;
 			}
-			return BlueBird.Promise.all([
+			return all([
 				// Get rows
 				// @ts-ignore
 				this.adapter.find(params),
@@ -1172,11 +1189,11 @@ module.exports = {
 			ctx: Context,
 			params: Record<string, unknown>
 		): object | Array<object> {
-			return BlueBird.Promise.resolve()
+			return resolve()
 				.then(() => {
 					if (Array.isArray(params.entities)) {
 						return (
-							BlueBird.Promise.all(
+							all(
 								params.entities.map((entity) =>
 									this.beforeEntityChange(
 										"create",
@@ -1189,7 +1206,7 @@ module.exports = {
 									this.validateEntity(entities)
 								)
 								.then((entities) =>
-									BlueBird.Promise.all(
+									all(
 										entities.map((entity: any) =>
 											this.beforeEntityChange(
 												"create",
@@ -1243,7 +1260,7 @@ module.exports = {
 								)
 						);
 					}
-					return BlueBird.Promise.reject(
+					return reject(
 						new Errors.MoleculerClientError(
 							"Invalid request! The 'params' must contain 'entity' or 'entities'!",
 							400
@@ -1277,10 +1294,7 @@ module.exports = {
 			let shouldMapping = params.mapping === true;
 			return this.getById(id, true)
 				.then((doc) => {
-					if (!doc)
-						return BlueBird.Promise.reject(
-							new EntityNotFoundError(id)
-						);
+					if (!doc) return reject(new EntityNotFoundError(id));
 
 					if (shouldMapping)
 						origDoc = isArray(doc)
@@ -1340,7 +1354,7 @@ module.exports = {
 			let id: any;
 
 			return (
-				BlueBird.Promise.resolve()
+				resolve()
 					.then(() => this.beforeEntityChange("update", params, ctx))
 					.then((params) => {
 						let sets: { [x: string]: any } = {};
@@ -1360,10 +1374,7 @@ module.exports = {
 					// @ts-ignore
 					.then((sets) => this.adapter.updateById(id, { $set: sets }))
 					.then((doc) => {
-						if (!doc)
-							return BlueBird.Promise.reject(
-								new EntityNotFoundError(id)
-							);
+						if (!doc) return reject(new EntityNotFoundError(id));
 						return this.transformDocuments(ctx, {}, doc).then(
 							(json) =>
 								this.entityChanged("updated", json, ctx).then(
@@ -1387,15 +1398,13 @@ module.exports = {
 		_remove(ctx: Context, params: Record<string, unknown>): any {
 			const id = this.decodeID(params.id);
 			return (
-				BlueBird.Promise.resolve()
+				resolve()
 					.then(() => this.beforeEntityChange("remove", params, ctx))
 					// @ts-ignore
 					.then(() => this.adapter.removeById(id))
 					.then((doc) => {
 						if (!doc)
-							return BlueBird.Promise.reject(
-								new EntityNotFoundError(params.id)
-							);
+							return reject(new EntityNotFoundError(params.id));
 						return this.transformDocuments(ctx, {}, doc).then(
 							(json) =>
 								this.entityChanged("removed", json, ctx).then(
@@ -1458,9 +1467,9 @@ module.exports = {
 				let res = check(entity);
 				if (check.async === true || res.then instanceof Function)
 					res = await res;
-				if (res === true) return BlueBird.Promise.resolve();
+				if (res === true) return resolve();
 				else
-					return BlueBird.Promise.reject(
+					return reject(
 						new Errors.ValidationError(
 							"Entity validation error!",
 							"",
@@ -1494,7 +1503,7 @@ module.exports = {
 				});
 			}
 			/* istanbul ignore next */
-			return BlueBird.Promise.reject(
+			return reject(
 				new Error("Please set the store adapter in schema on!")
 			);
 		}
@@ -1509,4 +1518,5 @@ module.exports = {
 
 	// Export Memory Adapter class
 	MemoryAdapter,
+	TypeORMDbAdapter,
 };

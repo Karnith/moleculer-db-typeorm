@@ -5,16 +5,16 @@
  */
 
 "use strict";
-
-import { cloneDeep } from "lodash";
-import Promise from "bluebird";
+import "reflect-metadata";
+import { cloneDeep, isArray } from "lodash";
+import { /* promisify, */ resolve } from "bluebird";
 import { Service, ServiceBroker, Errors } from "moleculer";
 import {
-	BaseEntity,
+	// BaseEntity,
 	DataSource,
-	// DataSource,
 	DataSourceOptions,
 	DeepPartial,
+	DeleteOptions,
 	DeleteResult,
 	// EntityManager,
 	EntitySchema,
@@ -32,7 +32,6 @@ import {
 	SaveOptions,
 	SelectQueryBuilder,
 	UpdateResult,
-	// Repository,
 } from "typeorm";
 import ConnectionManager from "./connectionManager";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
@@ -71,6 +70,8 @@ export default class TypeORMDbAdapter<Entity extends ObjectLiteral> {
 	 * @memberof TypeOrmDbAdapter
 	 */
 	init(broker: ServiceBroker, service: Service) {
+		this.broker = broker;
+		this.service = service;
 		const entityFromService = this.service.schema.model;
 		const isValid = !!entityFromService.constructor;
 		if (!isValid) {
@@ -78,8 +79,6 @@ export default class TypeORMDbAdapter<Entity extends ObjectLiteral> {
 				"Invalid model. It should be a typeorm repository"
 			);
 		}
-		this.broker = broker;
-		this.service = service;
 		this._entity = entityFromService;
 	}
 
@@ -89,14 +88,14 @@ export default class TypeORMDbAdapter<Entity extends ObjectLiteral> {
 	 * @returns {Promise}
 	 * @memberof TypeORMDbAdapter
 	 */
-	connect(): Promise<any> {
+	async connect(): Promise<any> {
 		/* this.db =
 			this.opts instanceof DataSource
 				? this.opts
 				: new DataSource(this.opts); */
 		this.connectionManager = new ConnectionManager();
-		this.db = this.connectionManager.create(this.opts);
-		[
+		this.db = await this.connectionManager.create(this.opts);
+		/* [
 			"options",
 			"isInitialized",
 			"driver",
@@ -118,23 +117,49 @@ export default class TypeORMDbAdapter<Entity extends ObjectLiteral> {
 			"createQueryBuilder",
 			"createQueryRunner",
 		].forEach((method) => {
-			this.db[method] = Promise.promisify(this.db[method]);
-		});
-		["connectionManager"].forEach((method) => {
-			this.db[method] = Promise.promisify(
-				this.db[method].bind(this.connectionManager)
-			);
-		});
+			this.db[method] = promisify(this.db[method]);
+		}); */
+		/* ["connectionManager"].forEach((method) => {
+			this.db[method] = this.connectionManager;
+		}); */
 		/* ["update"].forEach((method) => {
 			this.db[method] = Promise.promisify(this.db[method], {
 				multiArgs: true,
 			});
 		}); */
 
-		return this.db.initialize().then(() => {
+		return await this.db.initialize().then((datasource: any) => {
 			this.broker.logger.info(
-				`${this.service.name} has connected to ${this.db.name} database`
+				`${this.service.name} has connected to ${datasource.name} database`
 			);
+			/* const entity: { [key: string]: any } = this
+				._entity as unknown as DataSource;
+			[
+				"save",
+				// "isInitialized",
+				// "driver",
+				// "manager",
+				// "mongoManager",
+				// "initialize",
+				// "destroy",
+				// "synchronize",
+				// "dropDatabase",
+				// "runMigrations",
+				// "undoLastMigration",
+				// "hasMetadata",
+				// "getMetadata",
+				// "getRepository",
+				// "getTreeRepository",
+				// "getMongoRepository",
+				// "transaction",
+				// "query",
+				// "createQueryBuilder",
+				// "createQueryRunner",
+			].forEach((method) => {
+				this[method] = entity[method]();
+			}); */
+			this.dataSource = datasource;
+			return datasource;
 		});
 	}
 
@@ -144,14 +169,45 @@ export default class TypeORMDbAdapter<Entity extends ObjectLiteral> {
 	 * @returns {Promise}
 	 * @memberof MemoryDbAdapter
 	 */
-	disconnect(): Promise<any> {
-		this.db.connectionManager.has(this.db.name)
-			? this.db.connectionManager.close(this.db.name)
+	async disconnect(): Promise<any> {
+		this.broker.logger.info(
+			`Attempting to disconnect from database ${this.dataSource!.name}...`
+		);
+		this.connectionManager!.has(this.dataSource!.name || "default")
+			? await this.connectionManager!.close(
+					this.dataSource!.name || "default"
+			  ).then((disconnected) => {
+					isArray(disconnected)
+						? disconnected.forEach(async (connection) => {
+								(await connection)
+									? this.broker.logger.info(
+											`Disconnected from database ${
+												this.dataSource!.name
+											}`
+									  )
+									: this.broker.logger.info(
+											`Failed to disconnect from database ${
+												this.dataSource!.name
+											}`
+									  );
+						  })
+						: disconnected
+						? this.broker.logger.info(
+								`Disconnected from database ${
+									this.dataSource!.name
+								}`
+						  )
+						: this.broker.logger.info(
+								`Failed to disconnect from database ${
+									this.dataSource!.name
+								}`
+						  );
+			  })
 			: new Errors.MoleculerServerError(
-					`Connection ${this.db.name} does not exist`
+					`Connection ${this.dataSource!.name} does not exist`
 			  );
 		// this.db = null;
-		return Promise.resolve();
+		return resolve();
 	}
 
 	/**
@@ -167,58 +223,73 @@ export default class TypeORMDbAdapter<Entity extends ObjectLiteral> {
 	 * Checks if entity has an id.
 	 * If entity composite compose ids, it will check them all.
 	 */
-	hasId(): boolean {
+	async hasId(): Promise<boolean> {
 		// const baseEntity = this.db;
-		const baseEntity = this.constructor as typeof this.db;
-		return baseEntity.getRepository().hasId(this);
+		// const baseEntity = this.constructor as typeof this.db;
+		const baseEntity: any = this._entity!;
+		return await baseEntity.hasId(this);
 	}
 
 	/**
 	 * Saves current entity in the database.
 	 * If entity does not exist in the database then inserts, otherwise updates.
 	 */
-	save(options?: SaveOptions): Promise<this> {
+	async save(options?: SaveOptions): Promise<this> {
 		// const baseEntity = this.db;
-		const baseEntity = this.constructor as typeof this.db;
-		return baseEntity.getRepository().save(this, options);
+		// const baseEntity = this.constructor as typeof this.db;
+		const baseEntity: any = this._entity!;
+		return await baseEntity.save(options);
+		// return baseEntity.getRepository().save(this, options);
 	}
 
 	/**
 	 * Removes current entity from the database.
 	 */
-	remove(options?: RemoveOptions): Promise<this> {
+	async remove(options?: RemoveOptions): Promise<this> {
 		// const baseEntity = this.db;
-		const baseEntity = this.constructor as typeof this.db;
-		return baseEntity
-			.getRepository()
-			.remove(this, options) as Promise<this>;
+		// const baseEntity = this.constructor as typeof this.db;
+		const baseEntity: any = this._entity!;
+		return await baseEntity.remove(options);
+	}
+
+	/**
+	 * delete entity from the database by id.
+	 */
+	async delete(options?: DeleteOptions): Promise<this> {
+		// const baseEntity = this.db;
+		// const baseEntity = this.constructor as typeof this.db;
+		const baseEntity: any = this._entity!;
+		return await baseEntity.delete(options);
 	}
 
 	/**
 	 * Records the delete date of current entity.
 	 */
-	softRemove(options?: SaveOptions): Promise<this> {
+	async softRemove(options?: SaveOptions): Promise<this> {
 		// const baseEntity = this.db;
-		const baseEntity = this.constructor as typeof this.db;
-		return baseEntity.getRepository().softRemove(this, options);
+		// const baseEntity = this.constructor as typeof this.db;
+		const baseEntity: any = this._entity!;
+		return await baseEntity.softRemove(options);
 	}
 
 	/**
 	 * Recovers a given entity in the database.
 	 */
-	recover(options?: SaveOptions): Promise<this> {
+	async recover(options?: SaveOptions): Promise<this> {
 		// const baseEntity = this.db;
-		const baseEntity = this.constructor as typeof this.db;
-		return baseEntity.getRepository().recover(this, options);
+		// const baseEntity = this.constructor as typeof this.db;
+		const baseEntity: any = this._entity!;
+		return await baseEntity.recover(options);
 	}
 
 	/**
 	 * Reloads entity data from the database.
 	 */
-	reload(): Promise<void> {
+	async reload(): Promise<void> {
 		// const baseEntity = this.db;
-		const baseEntity = this.constructor as typeof this.db;
-		return baseEntity.getRepository().reload();
+		// const baseEntity = this.constructor as typeof this.db;
+		const baseEntity: any = this._entity!;
+		return await baseEntity.reload();
 	}
 
 	// -------------------------------------------------------------------------
@@ -228,8 +299,8 @@ export default class TypeORMDbAdapter<Entity extends ObjectLiteral> {
 	/**
 	 * Sets DataSource to be used by entity.
 	 */
-	useDataSource(dataSource: DataSource | null) {
-		this.dataSource = this.db;
+	useDataSource(dataSource: DataSource | undefined) {
+		this.dataSource = dataSource;
 	}
 
 	/**
@@ -340,8 +411,8 @@ export default class TypeORMDbAdapter<Entity extends ObjectLiteral> {
 	 * Saves all given entities in the database.
 	 * If entities do not exist in the database then inserts, otherwise updates.
 	 */
-	static save<T extends BaseEntity>(
-		this: { new (): T } & typeof BaseEntity,
+	static save<T extends ObjectLiteral>(
+		this: T,
 		entities: DeepPartial<T>[],
 		options?: SaveOptions
 	): Promise<T[]>;
@@ -350,8 +421,8 @@ export default class TypeORMDbAdapter<Entity extends ObjectLiteral> {
 	 * Saves a given entity in the database.
 	 * If entity does not exist in the database then inserts, otherwise updates.
 	 */
-	static save<T extends BaseEntity>(
-		this: { new (): T } & typeof BaseEntity,
+	static save<T extends ObjectLiteral>(
+		this: T,
 		entity: DeepPartial<T>,
 		options?: SaveOptions
 	): Promise<T>;
@@ -359,19 +430,19 @@ export default class TypeORMDbAdapter<Entity extends ObjectLiteral> {
 	/**
 	 * Saves one or many given entities.
 	 */
-	static save<T extends BaseEntity>(
-		this: { new (): T } & typeof BaseEntity,
+	static save<T extends ObjectLiteral>(
+		this: T,
 		entityOrEntities: DeepPartial<T> | DeepPartial<T>[],
 		options?: SaveOptions
 	) {
-		return this.getRepository<T>().save(entityOrEntities as any, options);
+		return this.getRepository().save(entityOrEntities as any, options);
 	}
 
 	/**
 	 * Removes a given entities from the database.
 	 */
-	static remove<T extends BaseEntity>(
-		this: { new (): T } & typeof BaseEntity,
+	static remove<T extends ObjectLiteral>(
+		this: T,
 		entities: T[],
 		options?: RemoveOptions
 	): Promise<T[]>;
@@ -379,8 +450,8 @@ export default class TypeORMDbAdapter<Entity extends ObjectLiteral> {
 	/**
 	 * Removes a given entity from the database.
 	 */
-	static remove<T extends BaseEntity>(
-		this: { new (): T } & typeof BaseEntity,
+	static remove<T extends ObjectLiteral>(
+		this: T,
 		entity: T,
 		options?: RemoveOptions
 	): Promise<T>;
@@ -388,19 +459,19 @@ export default class TypeORMDbAdapter<Entity extends ObjectLiteral> {
 	/**
 	 * Removes one or many given entities.
 	 */
-	static remove<T extends BaseEntity>(
-		this: { new (): T } & typeof BaseEntity,
+	static remove<T extends ObjectLiteral>(
+		this: T,
 		entityOrEntities: T | T[],
 		options?: RemoveOptions
 	) {
-		return this.getRepository<T>().remove(entityOrEntities as any, options);
+		return this.getRepository().remove(entityOrEntities as any, options);
 	}
 
 	/**
 	 * Records the delete date of all given entities.
 	 */
-	static softRemove<T extends BaseEntity>(
-		this: { new (): T } & typeof BaseEntity,
+	static softRemove<T extends ObjectLiteral>(
+		this: T,
 		entities: T[],
 		options?: SaveOptions
 	): Promise<T[]>;
@@ -408,8 +479,8 @@ export default class TypeORMDbAdapter<Entity extends ObjectLiteral> {
 	/**
 	 * Records the delete date of a given entity.
 	 */
-	static softRemove<T extends BaseEntity>(
-		this: { new (): T } & typeof BaseEntity,
+	static softRemove<T extends ObjectLiteral>(
+		this: T,
 		entity: T,
 		options?: SaveOptions
 	): Promise<T>;
@@ -417,12 +488,12 @@ export default class TypeORMDbAdapter<Entity extends ObjectLiteral> {
 	/**
 	 * Records the delete date of one or many given entities.
 	 */
-	static softRemove<T extends BaseEntity>(
-		this: { new (): T } & typeof BaseEntity,
+	static softRemove<T extends ObjectLiteral>(
+		this: T,
 		entityOrEntities: T | T[],
 		options?: SaveOptions
 	) {
-		return this.getRepository<T>().softRemove(
+		return this.getRepository().softRemove(
 			entityOrEntities as any,
 			options
 		);

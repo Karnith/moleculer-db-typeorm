@@ -7,7 +7,7 @@
 "use strict";
 
 import { cloneDeep, isNumber, isString, pick, values } from "lodash";
-import Promise from "bluebird";
+import { promisify, resolve } from "bluebird";
 import Datastore from "@seald-io/nedb";
 import { Service, ServiceBroker } from "moleculer";
 
@@ -47,7 +47,7 @@ export default class MemoryDbAdapter {
 	 * @returns {Promise}
 	 * @memberof MemoryDbAdapter
 	 */
-	connect(): Promise<any> {
+	async connect(): Promise<any> {
 		// this.db = new Datastore(this.opts); // in-memory
 		// if (this.opts instanceof Datastore) {}
 		// 	this.db = this.opts; //use preconfigured datastore
@@ -66,15 +66,15 @@ export default class MemoryDbAdapter {
 			"ensureIndex",
 			"removeIndex",
 		].forEach((method) => {
-			this.db[method] = Promise.promisify(this.db[method]);
+			this.db[method] = promisify(this.db[method]);
 		});
 		["update"].forEach((method) => {
-			this.db[method] = Promise.promisify(this.db[method], {
+			this.db[method] = promisify(this.db[method], {
 				multiArgs: true,
 			});
 		});
 
-		return this.db.loadDatabase();
+		return await this.db.loadDatabase();
 	}
 
 	/**
@@ -85,7 +85,7 @@ export default class MemoryDbAdapter {
 	 */
 	disconnect(): Promise<any> {
 		this.db = null;
-		return Promise.resolve();
+		return resolve();
 	}
 
 	/**
@@ -121,8 +121,8 @@ export default class MemoryDbAdapter {
 	 * @returns {Promise}
 	 * @memberof MemoryDbAdapter
 	 */
-	findOne(query: object): Promise<any> {
-		return this.db.findOne(query);
+	async findOne(query: object): Promise<any> {
+		return await this.db.findOne(query);
 	}
 
 	/**
@@ -132,8 +132,8 @@ export default class MemoryDbAdapter {
 	 * @returns {Promise}
 	 * @memberof MemoryDbAdapter
 	 */
-	findById(_id: any): Promise<any> {
-		return this.db.findOne({ _id });
+	async findById(_id: any): Promise<any> {
+		return await this.db.findOne({ _id });
 	}
 
 	/**
@@ -186,8 +186,8 @@ export default class MemoryDbAdapter {
 	 * @returns {Promise}
 	 * @memberof MemoryDbAdapter
 	 */
-	insert(entity: object): Promise<any> {
-		return this.db.insert(entity);
+	async insert(entity: object): Promise<any> {
+		return await this.db.insert(entity);
 	}
 
 	/**
@@ -197,8 +197,8 @@ export default class MemoryDbAdapter {
 	 * @returns {Promise}
 	 * @memberof MemoryDbAdapter
 	 */
-	insertMany(entities: Array<object>): Promise<any> {
-		return this.db.insert(entities);
+	async insertMany(entities: Array<object>): Promise<any> {
+		return await this.db.insert(entities);
 	}
 
 	/**
@@ -209,8 +209,8 @@ export default class MemoryDbAdapter {
 	 * @returns {Promise}
 	 * @memberof MemoryDbAdapter
 	 */
-	updateMany(query: object, update: object): Promise<any> {
-		return this.db
+	async updateMany(query: object, update: object): Promise<any> {
+		return await this.db
 			.update(query, update, { multi: true })
 			.then((res: any[]) => res[0]);
 	}
@@ -223,8 +223,8 @@ export default class MemoryDbAdapter {
 	 * @returns {Promise}
 	 * @memberof MemoryDbAdapter
 	 */
-	updateById(_id: any, update: object): Promise<any> {
-		return this.db
+	async updateById(_id: any, update: object): Promise<any> {
+		return await this.db
 			.update({ _id }, update, { returnUpdatedDocs: true })
 			.then((res: any[]) => res[1]);
 	}
@@ -236,8 +236,8 @@ export default class MemoryDbAdapter {
 	 * @returns {Promise}
 	 * @memberof MemoryDbAdapter
 	 */
-	removeMany(query: object): Promise<any> {
-		return this.db.remove(query, { multi: true });
+	async removeMany(query: object): Promise<any> {
+		return await this.db.remove(query, { multi: true });
 	}
 
 	/**
@@ -247,8 +247,8 @@ export default class MemoryDbAdapter {
 	 * @returns {Promise}
 	 * @memberof MemoryDbAdapter
 	 */
-	removeById(_id: any): Promise<any> {
-		return this.db.remove({ _id });
+	async removeById(_id: any): Promise<any> {
+		return await this.db.remove({ _id });
 	}
 
 	/**
@@ -257,8 +257,8 @@ export default class MemoryDbAdapter {
 	 * @returns {Promise}
 	 * @memberof MemoryDbAdapter
 	 */
-	clear(): Promise<any> {
-		return this.db.remove({}, { multi: true });
+	async clear(): Promise<any> {
+		return await this.db.remove({}, { multi: true });
 	}
 
 	/**

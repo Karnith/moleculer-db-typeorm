@@ -65,7 +65,9 @@ export default class ConnectionManager {
 	 * If connection name is not given then it will get a default connection.
 	 * Throws error if connection with the given name was not found.
 	 */
-	close(name: string | Array<string> = "default"): void {
+	async close(
+		name: string | Array<string> = "default"
+	): Promise<boolean | Promise<boolean>[]> {
 		const throwError = (name: string) => {
 			throw new ConnectionNotFoundError(name);
 		};
@@ -74,12 +76,24 @@ export default class ConnectionManager {
 			await connection.destroy();
 			this.remove(name);
 		};
-		!isArray(name) && this.connectionMap.has(name)
-			? closeConnection(name)
+		return !isArray(name) && this.connectionMap.has(name)
+			? await closeConnection(name)
+					.then(() => {
+						return true;
+					})
+					.catch(() => {
+						return false;
+					})
 			: isArray(name)
-			? name.map((connectionName: string) => {
-					this.connectionMap.has(connectionName)
-						? closeConnection(connectionName)
+			? name.map(async (connectionName: string) => {
+					return this.connectionMap.has(connectionName)
+						? await closeConnection(connectionName)
+								.then(() => {
+									return true;
+								})
+								.catch(() => {
+									return false;
+								})
 						: throwError(connectionName);
 			  })
 			: throwError(name);
@@ -89,7 +103,7 @@ export default class ConnectionManager {
 	 * Creates a new connection based on the given connection options and registers it in the manager.
 	 * Connection won't be established, you'll need to manually call connect method to establish connection.
 	 */
-	create(options: DataSourceOptions): DataSource {
+	async create(options: DataSourceOptions): Promise<DataSource> {
 		// check if such connection is already registered
 		const existConnection = this.connectionMap.get(
 			options.name || "default"
@@ -105,6 +119,6 @@ export default class ConnectionManager {
 		// create a new connection
 		const connection = new DataSource(options);
 		this.connectionMap.set(connection.name, connection);
-		return connection;
+		return Promise.resolve(connection);
 	}
 }
